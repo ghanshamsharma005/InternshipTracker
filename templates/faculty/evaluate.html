@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluate Internship - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Back Link -->
+                <div class="mb-4">
+                    <a href="{{ url_for('faculty.dashboard') }}" class="btn btn-outline-custom rounded-pill px-4 fs-7 py-2">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Dashboard
+                    </a>
+                </div>
+
+                <div class="card glass-card border border-secondary-soft p-4 p-md-5">
+                    <!-- Student details header -->
+                    <div class="border-bottom border-secondary-soft pb-3 mb-4">
+                        <span class="badge bg-primary-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                            Placement Evaluation
+                        </span>
+                        <h3 class="text-white fw-bold mb-1">Evaluate: {{ internship.student.user.name }}</h3>
+                        <p class="text-muted fs-7 mb-0">Roll No: <strong class="text-light">{{ internship.student.roll_no }}</strong> | Employer: <strong class="text-light">{{ internship.company.company_name }}</strong> | Role: <strong class="text-light">{{ internship.role }}</strong></p>
+                    </div>
+
+                    <form action="{{ url_for('faculty.evaluate_internship', student_id=internship.student_id) }}" method="POST" class="text-start">
+                        <p class="text-muted fs-7 mb-4">Grade the student on a scale from 0 (Unsatisfactory) to 10 (Outstanding) for each of the following rubrics.</p>
+                        
+                        <!-- Rubrics list -->
+                        <div class="row g-4 mb-4">
+                            <!-- Technical Skills -->
+                            <div class="col-md-6">
+                                <label for="technical_skills" class="form-label text-light fs-7 fw-semibold d-flex justify-content-between">
+                                    <span>Technical Skills</span>
+                                    <span class="text-primary-gradient fw-bold" id="tech_val">5 / 10</span>
+                                </label>
+                                <input type="range" class="form-range slider-input" min="0" max="10" step="1" value="5" id="technical_skills" name="technical_skills">
+                            </div>
+
+                            <!-- Communication -->
+                            <div class="col-md-6">
+                                <label for="communication" class="form-label text-light fs-7 fw-semibold d-flex justify-content-between">
+                                    <span>Communication</span>
+                                    <span class="text-primary-gradient fw-bold" id="comm_val">5 / 10</span>
+                                </label>
+                                <input type="range" class="form-range slider-input" min="0" max="10" step="1" value="5" id="communication" name="communication">
+                            </div>
+
+                            <!-- Punctuality -->
+                            <div class="col-md-6">
+                                <label for="punctuality" class="form-label text-light fs-7 fw-semibold d-flex justify-content-between">
+                                    <span>Punctuality & Attendance</span>
+                                    <span class="text-primary-gradient fw-bold" id="punc_val">5 / 10</span>
+                                </label>
+                                <input type="range" class="form-range slider-input" min="0" max="10" step="1" value="5" id="punctuality" name="punctuality">
+                            </div>
+
+                            <!-- Quality of Work -->
+                            <div class="col-md-6">
+                                <label for="work_quality" class="form-label text-light fs-7 fw-semibold d-flex justify-content-between">
+                                    <span>Quality of Deliverables</span>
+                                    <span class="text-primary-gradient fw-bold" id="qual_val">5 / 10</span>
+                                </label>
+                                <input type="range" class="form-range slider-input" min="0" max="10" step="1" value="5" id="work_quality" name="work_quality">
+                            </div>
+
+                            <!-- Discipline -->
+                            <div class="col-md-6">
+                                <label for="discipline" class="form-label text-light fs-7 fw-semibold d-flex justify-content-between">
+                                    <span>Professional Conduct & Discipline</span>
+                                    <span class="text-primary-gradient fw-bold" id="disc_val">5 / 10</span>
+                                </label>
+                                <input type="range" class="form-range slider-input" min="0" max="10" step="1" value="5" id="discipline" name="discipline">
+                            </div>
+
+                            <!-- Interactive Score Summary Card -->
+                            <div class="col-md-6">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 h-100 d-flex flex-column justify-content-center align-items-center text-center">
+                                    <small class="text-muted fs-8 mb-1">OVERALL EVALUATION SCORE</small>
+                                    <h2 class="text-white fw-extrabold mb-0" id="overall_val">5.0 / 10.0</h2>
+                                    <span class="badge bg-info-soft text-info mt-2 py-1 px-3 rounded-pill border border-info-soft fw-semibold fs-8" id="rating_label">Meets Expectations (B)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback -->
+                        <div class="mb-4">
+                            <label for="feedback" class="form-label text-light fs-7 fw-semibold">Overall Qualitative Feedback & Comments</label>
+                            <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="feedback" name="feedback" rows="3" placeholder="Provide comments on the student's performance, strength areas, and suggested improvements..."></textarea>
+                        </div>
+
+                        <!-- Submit button -->
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill mb-2">
+                            Submit Final Evaluation & Award Credits <i class="bi bi-file-earmark-check ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tech = document.getElementById('technical_skills');
+    const comm = document.getElementById('communication');
+    const punc = document.getElementById('punctuality');
+    const qual = document.getElementById('work_quality');
+    const disc = document.getElementById('discipline');
+
+    const techVal = document.getElementById('tech_val');
+    const commVal = document.getElementById('comm_val');
+    const puncVal = document.getElementById('punc_val');
+    const qualVal = document.getElementById('qual_val');
+    const discVal = document.getElementById('disc_val');
+    
+    const overallVal = document.getElementById('overall_val');
+    const ratingLabel = document.getElementById('rating_label');
+    
+    const sliders = [
+        { el: tech, out: techVal },
+        { el: comm, out: commVal },
+        { el: punc, out: puncVal },
+        { el: qual, out: qualVal },
+        { el: disc, out: discVal }
+    ];
+    
+    const updateCalculations = () => {
+        let total = 0;
+        sliders.forEach(slide => {
+            slide.out.textContent = slide.el.value + " / 10";
+            total += parseInt(slide.el.value);
+        });
+        
+        const avg = (total / sliders.length).toFixed(1);
+        overallVal.textContent = avg + " / 10.0";
+        
+        // Dynamic labels based on average score (out of 10)
+        if (avg >= 9.0) {
+            ratingLabel.textContent = "Outstanding (A+)";
+            ratingLabel.className = "badge bg-success-soft text-success mt-2 py-1 px-3 rounded-pill border border-success-soft fw-semibold fs-8";
+        } else if (avg >= 7.5) {
+            ratingLabel.textContent = "Exceeds Expectations (A)";
+            ratingLabel.className = "badge bg-primary-soft text-primary-gradient mt-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8";
+        } else if (avg >= 6.0) {
+            ratingLabel.textContent = "Meets Expectations (B)";
+            ratingLabel.className = "badge bg-info-soft text-info mt-2 py-1 px-3 rounded-pill border border-info-soft fw-semibold fs-8";
+        } else if (avg >= 4.0) {
+            ratingLabel.textContent = "Needs Improvement (C)";
+            ratingLabel.className = "badge bg-warning-soft text-warning mt-2 py-1 px-3 rounded-pill border border-warning-soft fw-semibold fs-8";
+        } else {
+            ratingLabel.textContent = "Unsatisfactory (F)";
+            ratingLabel.className = "badge bg-danger-soft text-danger mt-2 py-1 px-3 rounded-pill border border-danger-soft fw-semibold fs-8";
+        }
+    };
+    
+    sliders.forEach(slide => {
+        slide.el.addEventListener('input', updateCalculations);
+    });
+    
+    // Initial run
+    updateCalculations();
+});
+</script>
+{% endblock %}

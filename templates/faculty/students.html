@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Placements - Faculty Portal{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-11">
+                <!-- Welcome/Stats Card -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <h3 class="text-white fw-bold mb-1"><i class="bi bi-people me-2 text-primary-gradient"></i>Student Placements</h3>
+                    <p class="text-muted fs-7 mb-0">Search, filter, and review progress logs across all enrolled student internships.</p>
+                </div>
+
+                <!-- Search & Filters Toolbar -->
+                <div class="card glass-card border border-secondary-soft p-3 mb-4">
+                    <form action="{{ url_for('faculty.list_students') }}" method="GET" class="row g-2 align-items-center">
+                        <!-- Search Bar -->
+                        <div class="col-md-5">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text bg-dark-deep border-secondary-soft text-muted"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" name="search" placeholder="Search by student, roll number, or role..." value="{{ search_query }}">
+                            </div>
+                        </div>
+                        
+                        <!-- Status Filter -->
+                        <div class="col-md-4">
+                            <select class="form-select form-select-sm bg-dark-soft border-secondary-soft text-white" name="status">
+                                <option value="">-- All Statuses --</option>
+                                <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending Approval</option>
+                                <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active</option>
+                                <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary-gradient btn-sm rounded-pill w-100 py-2 fs-8">
+                                Apply Filter <i class="bi bi-funnel ms-1"></i>
+                            </button>
+                            <a href="{{ url_for('faculty.list_students') }}" class="btn btn-outline-custom btn-sm rounded-pill w-100 py-2 fs-8 text-center text-decoration-none">
+                                Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Student Placements Grid/Table -->
+                <div class="card glass-card border border-secondary-soft p-4">
+                    {% if students_data %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover border-secondary-soft align-middle fs-7 mb-0">
+                                <thead>
+                                    <tr class="text-muted">
+                                        <th>Student</th>
+                                        <th>Roll Number</th>
+                                        <th>Company</th>
+                                        <th>Role</th>
+                                        <th style="min-width: 150px;">Progress</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in students_data %}
+                                        <tr>
+                                            <td class="text-white fw-bold">{{ data.student.user.name }}</td>
+                                            <td>{{ data.student.roll_no }}</td>
+                                            <td>{{ data.internship.company.company_name }}</td>
+                                            <td>{{ data.internship.role }}</td>
+                                            
+                                            <!-- Progress Percentage Bar -->
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="progress bg-dark-deep w-100" style="height: 6px;">
+                                                        <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ data.progress }}%" aria-valuenow="{{ data.progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                                    </div>
+                                                    <span class="text-white fw-semibold" style="font-size: 0.75rem;">{{ data.progress }}%</span>
+                                                </div>
+                                            </td>
+                                            
+                                            <!-- Status Tag -->
+                                            <td>
+                                                {% if data.internship.status == 'pending' %}
+                                                    <span class="badge bg-warning-soft text-warning rounded-pill border border-warning-soft px-2 py-0.5 fs-8">Pending</span>
+                                                {% elif data.internship.status == 'approved' %}
+                                                    <span class="badge bg-primary-soft text-primary-gradient rounded-pill border border-primary-soft px-2 py-0.5 fs-8">Approved</span>
+                                                {% elif data.internship.status == 'active' %}
+                                                    <span class="badge bg-success-soft text-success rounded-pill border border-success-soft px-2 py-0.5 fs-8">Active</span>
+                                                {% elif data.internship.status == 'completed' %}
+                                                    <span class="badge bg-info-soft text-info rounded-pill border border-info-soft px-2 py-0.5 fs-8">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger-soft text-danger rounded-pill border border-danger-soft px-2 py-0.5 fs-8">Rejected</span>
+                                                {% endif %}
+                                            </td>
+                                            
+                                            <!-- Actions link -->
+                                            <td class="text-end">
+                                                <a href="{{ url_for('faculty.student_detail', student_id=data.student.id) }}" class="btn btn-outline-custom btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                    View Profile <i class="bi bi-arrow-right-short ms-1"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-5 mb-0">No matching student placements found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

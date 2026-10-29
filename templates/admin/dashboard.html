@@ -1,0 +1,584 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard & Analytics - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <!-- Welcome banner & Course Filter -->
+        <div class="card glass-card border border-secondary-soft p-4 mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <span class="badge bg-primary-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                        Placement Cell Portal &bull; Analytics Suite
+                    </span>
+                    <h2 class="text-white fw-bold mb-0">System Administration & Analytics</h2>
+                    <p class="text-muted fs-7 mb-0">Real-time database metrics, registration trends, and department performance analytics.</p>
+                </div>
+                <!-- Filter by Course -->
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <form method="GET" action="{{ url_for('admin.dashboard') }}" class="d-flex align-items-center gap-2" id="courseFilterForm">
+                        <label for="courseSelect" class="text-muted fs-7 fw-semibold text-nowrap mb-0">
+                            <i class="bi bi-funnel me-1"></i> Filter Course:
+                        </label>
+                        <select name="course" id="courseSelect" class="form-select form-select-sm glass-card border-secondary-soft text-white" style="width: auto; min-width: 170px;" onchange="this.form.submit()">
+                            <option value="">All Academic Courses</option>
+                            {% for c in available_courses %}
+                                <option value="{{ c }}" {% if selected_course == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                        {% if selected_course %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Clear filter">
+                                <i class="bi bi-x-circle me-1"></i> Reset
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Primary KPI Statistics Grid -->
+        <div class="row g-3 mb-4">
+            <!-- Total Students -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1">TOTAL STUDENTS</span>
+                    <h3 class="text-white fw-extrabold mb-0">{{ total_students }}</h3>
+                </div>
+            </div>
+            
+            <!-- Total Placements -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1">TOTAL PLACEMENTS</span>
+                    <h3 class="text-white fw-extrabold mb-0">{{ total_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Active -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1 text-success">ACTIVE</span>
+                    <h3 class="text-success fw-extrabold mb-0">{{ active_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Completed -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1 text-info">COMPLETED</span>
+                    <h3 class="text-info fw-extrabold mb-0">{{ completed_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Pending -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1 text-warning">PENDING APPROVAL</span>
+                    <h3 class="text-warning fw-extrabold mb-0">{{ pending_approvals }}</h3>
+                </div>
+            </div>
+
+            <!-- Completion Rate -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100 bg-primary-soft">
+                    <span class="text-muted fs-8 d-block mb-1 text-white">COMPLETION RATE</span>
+                    <h3 class="text-primary-gradient fw-extrabold mb-0">{{ completion_rate }}%</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Useful Metrics Strip -->
+        <div class="row g-3 mb-5">
+            <!-- Avg Duration -->
+            <div class="col-md-4">
+                <div class="card glass-card border border-secondary-soft p-3 d-flex flex-row align-items-center gap-3 h-100">
+                    <div class="brand-icon-wrapper bg-primary-soft rounded-circle d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; min-width: 46px;">
+                        <i class="bi bi-calendar-range text-primary fs-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Avg Internship Duration</span>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <h4 class="text-white fw-bold mb-0">
+                                {% if avg_duration_days > 0 %}
+                                    {{ avg_duration_days }} <span class="fs-7 text-muted fw-normal">days</span>
+                                {% else %}
+                                    <span class="text-muted fs-7">N/A</span>
+                                {% endif %}
+                            </h4>
+                            {% if avg_duration_weeks > 0 %}
+                                <span class="badge bg-secondary-soft text-muted fs-8 rounded-pill">~{{ avg_duration_weeks }} wks</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avg Faculty Evaluation Score -->
+            <div class="col-md-4">
+                <div class="card glass-card border border-secondary-soft p-3 d-flex flex-row align-items-center gap-3 h-100">
+                    <div class="brand-icon-wrapper bg-warning-soft rounded-circle d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; min-width: 46px; background: rgba(234, 179, 8, 0.1) !important;">
+                        <i class="bi bi-star-fill text-warning fs-5"></i>
+                    </div>
+                    <div>
+                        <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Avg Evaluation Score</span>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <h4 class="text-white fw-bold mb-0">
+                                {% if avg_evaluation_score is not none %}
+                                    {{ avg_evaluation_score }} <span class="fs-7 text-muted fw-normal">/ 10</span>
+                                {% else %}
+                                    <span class="text-muted fs-7">No evaluations yet</span>
+                                {% endif %}
+                            </h4>
+                            {% if avg_evaluation_score is not none %}
+                                <span class="badge {% if avg_evaluation_score >= 8.0 %}bg-success-soft text-success{% elif avg_evaluation_score >= 6.0 %}bg-info-soft text-info{% else %}bg-warning-soft text-warning{% endif %} fs-8 rounded-pill">
+                                    {% if avg_evaluation_score >= 8.0 %}Exemplary{% elif avg_evaluation_score >= 6.0 %}Proficient{% else %}Developing{% endif %}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Most Popular Companies -->
+            <div class="col-md-4">
+                <div class="card glass-card border border-secondary-soft p-3 d-flex flex-row align-items-center gap-3 h-100">
+                    <div class="brand-icon-wrapper bg-success-soft rounded-circle d-flex align-items-center justify-content-center" style="width: 46px; height: 46px; min-width: 46px; background: rgba(16, 185, 129, 0.1) !important;">
+                        <i class="bi bi-trophy text-success fs-5"></i>
+                    </div>
+                    <div class="w-100 overflow-hidden">
+                        <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Top Corporate Partners</span>
+                        {% if most_popular_companies %}
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                {% for comp in most_popular_companies %}
+                                    <span class="badge bg-dark-soft border border-secondary-soft text-white fs-8 py-1 px-2 text-truncate" style="max-width: 140px;" title="{{ comp.name }}: {{ comp.count }} placements">
+                                        <i class="bi bi-building me-1 text-primary"></i>{{ comp.name }} ({{ comp.count }})
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <span class="text-muted fs-7">No placements recorded</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics & Charts Grid -->
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h4 class="text-white fw-bold mb-0 d-flex align-items-center gap-2">
+                <i class="bi bi-pie-chart text-primary"></i> Interactive Placement Analytics
+            </h4>
+            <span class="badge bg-dark-soft text-muted border border-secondary-soft fs-8 py-1 px-3 rounded-pill">
+                Live Database Feeds
+            </span>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <!-- 1. Internship Status Distribution Chart -->
+            <div class="col-lg-6">
+                <div class="card glass-card border border-secondary-soft p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Internship Status Distribution</h5>
+                            <p class="text-muted fs-8 mb-0">Breakdown of all placements by lifecycle approval stage</p>
+                        </div>
+                        <span class="badge bg-primary-soft text-primary fs-8">Status</span>
+                    </div>
+                    <div class="position-relative" style="min-height: 280px; max-height: 320px;">
+                        <canvas id="statusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Completion Rate Chart -->
+            <div class="col-lg-6">
+                <div class="card glass-card border border-secondary-soft p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Completion Rate Analysis</h5>
+                            <p class="text-muted fs-8 mb-0">Completed vs. Active / In-Progress placements ({{ completion_rate }}% achieved)</p>
+                        </div>
+                        <span class="badge bg-success-soft text-success fs-8">Rate: {{ completion_rate }}%</span>
+                    </div>
+                    <div class="position-relative" style="min-height: 280px; max-height: 320px;">
+                        <canvas id="completionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Monthly Registrations Trend Chart -->
+            <div class="col-lg-6">
+                <div class="card glass-card border border-secondary-soft p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Monthly Internship Registrations</h5>
+                            <p class="text-muted fs-8 mb-0">New placement registration volume trend over time</p>
+                        </div>
+                        <span class="badge bg-info-soft text-info fs-8">Monthly Trend</span>
+                    </div>
+                    <div class="position-relative" style="min-height: 280px; max-height: 320px;">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Internships by Company Chart -->
+            <div class="col-lg-6">
+                <div class="card glass-card border border-secondary-soft p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h5 class="text-white fw-bold mb-1">Internships by Corporate Partner</h5>
+                            <p class="text-muted fs-8 mb-0">Placement distribution across industry partner organizations</p>
+                        </div>
+                        <span class="badge bg-warning-soft text-warning fs-8">Corporate Volume</span>
+                    </div>
+                    <div class="position-relative" style="min-height: 280px; max-height: 320px;">
+                        <canvas id="companyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Navigation Hub -->
+        <h4 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-grid-fill text-primary"></i> Administrative Management Hub
+        </h4>
+        <div class="row g-4">
+            <!-- Student Management Card -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card glass-card border border-secondary-soft p-4 h-100 hover-lift d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="brand-icon-wrapper bg-primary mx-auto mb-3" style="width: 45px; height: 45px; background: rgba(59, 130, 246, 0.1) !important;">
+                            <i class="bi bi-people brand-icon text-primary fs-5" style="line-height: 45px;"></i>
+                        </div>
+                        <h4 class="text-white fw-bold text-center mb-2">Student Registry</h4>
+                        <p class="text-muted fs-7 text-center">View student records, modify details, add students, and manage portal access.</p>
+                    </div>
+                    <a href="{{ url_for('admin.list_students') }}" class="btn btn-primary-gradient w-100 rounded-pill mt-3">
+                        Students <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Internship Management Card -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card glass-card border border-secondary-soft p-4 h-100 hover-lift d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="brand-icon-wrapper bg-warning mx-auto mb-3" style="width: 45px; height: 45px; background: rgba(234, 179, 8, 0.1) !important;">
+                            <i class="bi bi-briefcase brand-icon text-warning fs-5" style="line-height: 45px;"></i>
+                        </div>
+                        <h4 class="text-white fw-bold text-center mb-2">Placement Review</h4>
+                        <p class="text-muted fs-7 text-center">Approve or reject pending requests, monitor timelines, and edit placement contracts.</p>
+                    </div>
+                    <a href="{{ url_for('admin.list_internships') }}" class="btn btn-primary-gradient w-100 rounded-pill mt-3">
+                        Internships <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Company Management Card -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card glass-card border border-secondary-soft p-4 h-100 hover-lift d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="brand-icon-wrapper bg-success mx-auto mb-3" style="width: 45px; height: 45px; background: rgba(16, 185, 129, 0.1) !important;">
+                            <i class="bi bi-building brand-icon text-success fs-5" style="line-height: 45px;"></i>
+                        </div>
+                        <h4 class="text-white fw-bold text-center mb-2">Corporate Registry</h4>
+                        <p class="text-muted fs-7 text-center">Manage company partners, track placement intake, and update industry entries.</p>
+                    </div>
+                    <a href="{{ url_for('admin.list_companies') }}" class="btn btn-primary-gradient w-100 rounded-pill mt-3">
+                        Companies <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reports & Export Card -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card glass-card border border-secondary-soft p-4 h-100 hover-lift d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="brand-icon-wrapper bg-info mx-auto mb-3" style="width: 45px; height: 45px; background: rgba(14, 165, 233, 0.1) !important;">
+                            <i class="bi bi-file-earmark-bar-graph brand-icon text-info fs-5" style="line-height: 45px;"></i>
+                        </div>
+                        <h4 class="text-white fw-bold text-center mb-2">Reports & Export</h4>
+                        <p class="text-muted fs-7 text-center">Generate official institutional audit reports and export to PDF and CSV formats.</p>
+                    </div>
+                    <a href="{{ url_for('admin.reports') }}" class="btn btn-primary-gradient w-100 rounded-pill mt-3">
+                        Reports & Export <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js 4.4.1 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Extract real database chart payload
+    const chartPayload = {{ chart_data | tojson }};
+    
+    // Global Chart.js styling defaults for glassmorphic dark theme
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+    Chart.defaults.plugins.tooltip.backgroundColor = '#0F131C';
+    Chart.defaults.plugins.tooltip.titleColor = '#ffffff';
+    Chart.defaults.plugins.tooltip.bodyColor = '#cbd5e1';
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.1)';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 10;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    
+    // -------------------------------------------------------------
+    // 1. Internship Status Chart (Doughnut)
+    // -------------------------------------------------------------
+    const statusCtx = document.getElementById('statusChart');
+    if (statusCtx) {
+        const statusLabels = chartPayload.status.labels;
+        const statusValues = chartPayload.status.data;
+        const totalStatusCount = statusValues.reduce((a, b) => a + b, 0);
+
+        new Chart(statusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: totalStatusCount > 0 ? statusValues : [1],
+                    backgroundColor: totalStatusCount > 0 ? [
+                        '#eab308', // Pending (Amber)
+                        '#3b82f6', // Approved (Blue)
+                        '#10b981', // Active (Emerald)
+                        '#8b5cf6', // Completed (Purple)
+                        '#ef4444'  // Rejected (Rose)
+                    ] : ['rgba(255, 255, 255, 0.1)'],
+                    borderColor: '#0F131C',
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0',
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (totalStatusCount === 0) return ' No data available';
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const pct = ((value / totalStatusCount) * 100).toFixed(1);
+                                return ` ${label}: ${value} (${pct}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 2. Completion Rate Chart (Doughnut)
+    // -------------------------------------------------------------
+    const completionCtx = document.getElementById('completionChart');
+    if (completionCtx) {
+        const completionLabels = chartPayload.completion.labels;
+        const completionValues = chartPayload.completion.data;
+        const totalPlacements = completionValues.reduce((a, b) => a + b, 0);
+
+        new Chart(completionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: completionLabels,
+                datasets: [{
+                    data: totalPlacements > 0 ? completionValues : [1],
+                    backgroundColor: totalPlacements > 0 ? [
+                        '#10b981', // Completed (Emerald)
+                        'rgba(148, 163, 184, 0.25)' // Not Completed (Muted Slate)
+                    ] : ['rgba(255, 255, 255, 0.1)'],
+                    borderColor: '#0F131C',
+                    borderWidth: 3,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e2e8f0',
+                            padding: 15,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (totalPlacements === 0) return ' No data available';
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const pct = ((value / totalPlacements) * 100).toFixed(1);
+                                return ` ${label}: ${value} (${pct}%)`;
+                            }
+                        }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 3. Monthly Internship Registrations Chart (Line/Area)
+    // -------------------------------------------------------------
+    const monthlyCtx = document.getElementById('monthlyChart');
+    if (monthlyCtx) {
+        const monthlyLabels = chartPayload.monthly.labels.length > 0 
+            ? chartPayload.monthly.labels 
+            : ['No Records'];
+        const monthlyValues = chartPayload.monthly.data.length > 0 
+            ? chartPayload.monthly.data 
+            : [0];
+
+        const ctx = monthlyCtx.getContext('2d');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.45)');
+        gradient.addColorStop(1, 'rgba(79, 70, 229, 0.0)');
+
+        new Chart(monthlyCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyLabels,
+                datasets: [{
+                    label: 'Registrations',
+                    data: monthlyValues,
+                    borderColor: '#6366f1',
+                    borderWidth: 3,
+                    backgroundColor: gradient,
+                    fill: true,
+                    tension: 0.35,
+                    pointBackgroundColor: '#818cf8',
+                    pointBorderColor: '#0F131C',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
+    // 4. Internships by Company Chart (Bar)
+    // -------------------------------------------------------------
+    const companyCtx = document.getElementById('companyChart');
+    if (companyCtx) {
+        const companyLabels = chartPayload.company.labels.length > 0 
+            ? chartPayload.company.labels 
+            : ['No Companies'];
+        const companyValues = chartPayload.company.data.length > 0 
+            ? chartPayload.company.data 
+            : [0];
+
+        new Chart(companyCtx, {
+            type: 'bar',
+            data: {
+                labels: companyLabels,
+                datasets: [{
+                    label: 'Placements',
+                    data: companyValues,
+                    backgroundColor: 'rgba(14, 165, 233, 0.8)',
+                    hoverBackgroundColor: '#0ea5e9',
+                    borderRadius: 6,
+                    borderSkipped: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                            color: '#94a3b8'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#94a3b8',
+                            maxRotation: 45,
+                            minRotation: 0,
+                            callback: function(val, index) {
+                                const text = this.getLabelForValue(val);
+                                return text.length > 14 ? text.substr(0, 14) + '...' : text;
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

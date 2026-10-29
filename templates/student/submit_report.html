@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Report - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <!-- Breadcrumbs/Back button -->
+                <div class="mb-4">
+                    <a href="{{ url_for('student.view_timeline') }}" class="btn btn-outline-custom rounded-pill px-4 fs-7 py-2">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Timeline
+                    </a>
+                </div>
+
+                <div class="card glass-card border border-secondary-soft shadow-lg p-4 p-md-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="brand-icon-wrapper me-3">
+                            <i class="bi bi-file-earmark-text brand-icon"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary-soft text-primary-gradient mb-1 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                                Document Submission
+                            </span>
+                            <h3 class="text-white fw-bold mb-0">{{ event.title }} Submission</h3>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted fs-7 mb-4">
+                        Please fill in the log for your progress during this stage. Once submitted, your timeline stage will automatically transition to completed.
+                    </p>
+                    
+                    <form action="{{ url_for('student.submit_report', event_id=event.id) }}" method="POST" enctype="multipart/form-data" class="text-start">
+                        <!-- Tasks Completed -->
+                        <div class="mb-3">
+                            <label for="tasks_completed" class="form-label text-light fs-7 fw-semibold">Tasks Completed <span class="text-danger">*</span></label>
+                            <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="tasks_completed" name="tasks_completed" rows="4" placeholder="Detail the key tasks and assignments you worked on..." required></textarea>
+                        </div>
+                        
+                        <div class="row g-3 mb-3">
+                            <!-- Skills Learned -->
+                            <div class="col-md-6">
+                                <label for="skills_learned" class="form-label text-light fs-7 fw-semibold">Skills Acquired / Practiced</label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="skills_learned" name="skills_learned" placeholder="e.g. Flask, Git, Docker">
+                            </div>
+                            
+                            <!-- Hours Worked -->
+                            <div class="col-md-6">
+                                <label for="hours_worked" class="form-label text-light fs-7 fw-semibold">Hours Worked This Period <span class="text-danger">*</span></label>
+                                <input type="number" step="0.5" min="0" class="form-control bg-dark-soft border-secondary-soft text-white" id="hours_worked" name="hours_worked" placeholder="e.g. 40" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Challenges Faced -->
+                        <div class="mb-4">
+                            <label for="challenges" class="form-label text-light fs-7 fw-semibold">Challenges & Blockers</label>
+                            <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="challenges" name="challenges" rows="2" placeholder="Briefly list any difficulties faced or roadblocks encountered..."></textarea>
+                        </div>
+                        
+                        <!-- File Upload -->
+                        <div class="mb-4">
+                            <label for="report_file" class="form-label text-light fs-7 fw-semibold">Attach Report Document / Weekly Artifact (Optional)</label>
+                            <input type="file" class="form-control bg-dark-soft border-secondary-soft text-white" id="report_file" name="report_file">
+                            <small class="text-muted fs-8 mt-1 d-block">Supported formats: PDF, DOCX, ZIP, PNG, JPG (Max size: 16MB)</small>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill mb-2">
+                            Submit Report & Update Stage <i class="bi bi-send ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

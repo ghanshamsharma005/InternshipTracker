@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Access Denied - 403 Forbidden{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-9 text-center">
+                <div class="card glass-card border border-danger-soft shadow-lg p-5">
+                    <div class="brand-icon-wrapper bg-danger mx-auto mb-4" style="background: linear-gradient(135deg, #EF4444 0%, #B91C1C 100%) !important;">
+                        <i class="bi bi-shield-slash-fill brand-icon"></i>
+                    </div>
+                    
+                    <h1 class="text-white fw-bold mb-2">403 - Access Denied</h1>
+                    <p class="text-danger fw-semibold mb-4"><i class="bi bi-exclamation-triangle-fill me-2"></i>ROLE AUTHORIZATION FAILURE</p>
+                    
+                    <p class="text-muted fs-6 mb-4 max-w-600 mx-auto">
+                        You do not have the required permissions to access this page. 
+                        The requested route is protected by active security policies restricting cross-role directory browsing.
+                    </p>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="javascript:history.back()" class="btn btn-outline-custom rounded-pill px-4">
+                            <i class="bi bi-arrow-left me-2"></i> Go Back
+                        </a>
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary-gradient rounded-pill px-4">
+                            <i class="bi bi-house-door me-2"></i> Return Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

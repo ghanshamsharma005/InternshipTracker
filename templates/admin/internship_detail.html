@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}Placement Progress - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <!-- Back Link & Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <a href="{{ url_for('admin.list_internships') }}" class="btn btn-outline-custom rounded-pill px-4 fs-7 py-2">
+                <i class="bi bi-arrow-left me-2"></i> Back to Review Hub
+            </a>
+            
+            {% if internship.status == 'pending' %}
+                <div class="d-flex gap-2">
+                    <form action="{{ url_for('admin.approve_internship', internship_id=internship.id) }}" method="POST">
+                        <button type="submit" class="btn btn-success rounded-pill px-4">Approve Placement</button>
+                    </form>
+                    <form action="{{ url_for('admin.reject_internship', internship_id=internship.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger rounded-pill px-4">Reject Placement</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Student & Placement metadata -->
+            <div class="col-lg-5">
+                <!-- Info Card -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4 text-start">
+                    <span class="badge bg-primary-soft text-primary-gradient mb-3 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8 align-self-start">
+                        Placement Profile
+                    </span>
+                    
+                    <h3 class="text-white fw-bold mb-1">{{ student.user.name }}</h3>
+                    <p class="text-muted fs-7 mb-4">Roll Number: <strong class="text-light">{{ student.roll_no }}</strong> | Course: <strong class="text-light">{{ student.course }}</strong></p>
+                    
+                    <div class="row g-3 fs-7">
+                        <div class="col-6">
+                            <span class="text-muted d-block fs-8">EMPLOYER</span>
+                            <span class="text-white fw-semibold">{{ internship.company.company_name if internship.company else 'N/A' }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block fs-8">ROLE</span>
+                            <span class="text-white fw-semibold">{{ internship.role }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block fs-8">FORMAT</span>
+                            <span class="badge bg-dark-soft text-light border border-secondary-soft mt-1">{{ internship.internship_type | upper }}</span>
+                        </div>
+                        <div class="col-6">
+                            <span class="text-muted d-block fs-8">STATUS</span>
+                            <span class="badge bg-dark-soft text-light mt-1">
+                                {{ internship.status | upper }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supervisor details -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4 text-start">
+                    <h5 class="text-white fw-bold mb-3"><i class="bi bi-person-badge text-primary-gradient me-2"></i>Supervisor Info</h5>
+                    <p class="text-light fs-7 mb-1"><strong>Name:</strong> {{ internship.supervisor_name if internship.supervisor_name else 'N/A' }}</p>
+                    <p class="text-light fs-7 mb-1"><strong>Email:</strong> {{ internship.supervisor_email if internship.supervisor_email else 'N/A' }}</p>
+                    <p class="text-light fs-7 mb-0"><strong>Phone:</strong> {{ internship.supervisor_phone if internship.supervisor_phone else 'N/A' }}</p>
+                </div>
+
+                <!-- Academic Evaluation -->
+                <div class="card glass-card border border-secondary-soft p-4 text-start">
+                    <h5 class="text-white fw-bold mb-3"><i class="bi bi-award text-primary-gradient me-2"></i>Academic Assessment</h5>
+                    {% if evaluation %}
+                        <div class="bg-dark-soft border border-secondary-soft p-3 rounded text-center mb-3">
+                            <small class="text-muted fs-8 d-block mb-1">OVERALL GRADE SCORE</small>
+                            <h3 class="text-white fw-extrabold mb-0 font-monospace">{{ "%.1f"|format(evaluation.overall_score) }} / 10.0</h3>
+                        </div>
+                        <div class="row g-2 fs-7 mb-3 text-light">
+                            <div class="col-6">Technical Skills: <strong>{{ evaluation.technical_skills }}/10</strong></div>
+                            <div class="col-6">Communication: <strong>{{ evaluation.communication }}/10</strong></div>
+                            <div class="col-6">Punctuality: <strong>{{ evaluation.punctuality }}/10</strong></div>
+                            <div class="col-6">Work Quality: <strong>{{ evaluation.work_quality }}/10</strong></div>
+                            <div class="col-6">Discipline: <strong>{{ evaluation.discipline }}/10</strong></div>
+                        </div>
+                        <div class="p-3 bg-dark-deep rounded fs-7 italic-quote">
+                            "{{ evaluation.feedback if evaluation.feedback else 'No comments provided.' }}"
+                        </div>
+                    {% else %}
+                        <p class="text-muted fs-7 mb-0">No evaluation sheet has been submitted for this placement yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Column: Timeline tracker, Logs, and Documents -->
+            <div class="col-lg-7">
+                <!-- Checklist Progress -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4 text-start">
+                    <div class="d-flex justify-content-between text-muted fs-8 mb-2">
+                        <span class="fw-semibold text-white">Overall Milestone Checklist</span>
+                        <span class="fw-bold text-white">{{ progress_percent }}%</span>
+                    </div>
+                    <div class="progress bg-dark-deep mb-4" style="height: 8px;">
+                        <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ progress_percent }}%"></div>
+                    </div>
+
+                    <h5 class="text-white fw-bold mb-3">Timeline Events Journey</h5>
+                    <div class="timeline-container ps-2 border-start border-secondary-soft position-relative ms-3">
+                        {% for ev in timeline_events %}
+                            <div class="timeline-item position-relative mb-4 ps-3">
+                                <!-- Marker -->
+                                <div class="position-absolute rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="left: -12px; top: 0; width: 22px; height: 22px; background-color: {% if ev.status == 'completed' %}#10b981{% elif ev.status == 'in_progress' %}#3b82f6{% else %}#374151{% endif %}; border: 3px solid #111827; z-index: 2;">
+                                    {% if ev.status == 'completed' %}
+                                        <i class="bi bi-check text-white fs-8" style="line-height:1;"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="text-white fw-bold mb-0 fs-7">{{ ev.title }}</h6>
+                                    <span class="badge {% if ev.status == 'completed' %}bg-success-soft text-success{% elif ev.status == 'in_progress' %}bg-primary-soft text-primary{% else %}bg-dark-soft text-muted{% endif %} rounded-pill fs-9 py-0.5">
+                                        {{ ev.status | upper }}
+                                    </span>
+                                </div>
+                                <p class="text-muted fs-8 mb-0">{{ ev.description }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Documents List -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4 text-start">
+                    <h5 class="text-white fw-bold mb-3"><i class="bi bi-file-earmark-check text-primary-gradient me-2"></i>Placement Documentation</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped align-middle mb-0 fs-7">
+                            <thead>
+                                <tr class="border-secondary-soft">
+                                    <th>Document Type</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if documents %}
+                                    {% for doc in documents %}
+                                        <tr class="border-secondary-soft">
+                                            <td><span class="fw-bold text-light">{{ doc.document_type }}</span></td>
+                                            <td>
+                                                {% if doc.status == 'verified' %}
+                                                    <span class="badge bg-success-soft text-success rounded-pill fs-8">Verified</span>
+                                                {% elif doc.status == 'rejected' %}
+                                                    <span class="badge bg-danger-soft text-danger rounded-pill fs-8">Rejected</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning-soft text-warning rounded-pill fs-8">Pending Review</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                {% if doc.status == 'pending' %}
+                                                    <form action="{{ url_for('faculty.verify_document', document_id=doc.id) }}" method="POST" class="d-inline">
+                                                        <button type="submit" class="btn btn-outline-success btn-xs rounded-pill px-2.5 py-1 fs-8">Verify</button>
+                                                    </form>
+                                                    <form action="{{ url_for('faculty.reject_document', document_id=doc.id) }}" method="POST" class="d-inline">
+                                                        <button type="submit" class="btn btn-outline-danger btn-xs rounded-pill px-2.5 py-1 fs-8">Reject</button>
+                                                    </form>
+                                                {% endif %}
+                                                <a href="{{ url_for('student.download_document', document_id=doc.id) }}" class="btn btn-outline-custom btn-xs rounded-pill px-2.5 py-1 fs-8">
+                                                    Download <i class="bi bi-download ms-0.5"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center py-4 text-muted fs-7">No documents uploaded by the student yet.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Progress Reports log -->
+                <div class="card glass-card border border-secondary-soft p-4 text-start">
+                    <h5 class="text-white fw-bold mb-3"><i class="bi bi-journals text-primary-gradient me-2"></i>Weekly Progress Logs</h5>
+                    {% if progress_reports %}
+                        {% for report in progress_reports %}
+                            <div class="p-3 bg-dark-soft border border-secondary-soft rounded mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="text-white fw-bold mb-0 fs-7">Week {{ report.week_number }} Progress Log</h6>
+                                    <span class="badge {% if report.status == 'approved' %}bg-success-soft text-success{% else %}bg-warning-soft text-warning{% endif %} rounded-pill fs-8">
+                                        {{ report.status | upper }}
+                                    </span>
+                                </div>
+                                <p class="text-light fs-7 mb-1"><strong>Tasks Completed:</strong> {{ report.tasks_completed }}</p>
+                                <p class="text-light fs-7 mb-2"><strong>Hours Worked:</strong> {{ report.hours_worked }} Hours</p>
+                                {% if report.feedback %}
+                                    <div class="mt-2.5 p-2 bg-dark-deep rounded border border-secondary-soft fs-7 text-muted">
+                                        <strong class="text-light">Advisor Feedback:</strong> "{{ report.feedback }}"
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted fs-7 mb-0">No weekly progress logs have been logged yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Dashboard - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-11 col-md-12">
+                <!-- Welcome Widget -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <span class="badge bg-success-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-success-soft fw-semibold fs-8">
+                                Faculty Portal
+                            </span>
+                            <h2 class="text-white fw-bold mb-0">Welcome, {{ faculty.user.name }}</h2>
+                            <p class="text-muted fs-7 mb-0">Dept: <strong class="text-light">{{ faculty.department }}</strong> | Employee ID: <strong class="text-light">{{ faculty.employee_id }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid (5 Cards) -->
+                <div class="row g-3 mb-4">
+                    <!-- Total Students -->
+                    <div class="col-md">
+                        <div class="card glass-card border border-secondary-soft p-3 text-center">
+                            <span class="text-muted fs-8 d-block mb-1">TOTAL STUDENTS</span>
+                            <h3 class="text-white fw-extrabold mb-0">{{ total_students }}</h3>
+                        </div>
+                    </div>
+                    <!-- Pending Approvals -->
+                    <div class="col-md">
+                        <div class="card glass-card border border-secondary-soft p-3 text-center">
+                            <span class="text-muted fs-8 d-block mb-1">PENDING APPROVALS</span>
+                            <h3 class="text-warning fw-extrabold mb-0">{{ pending_approvals_count }}</h3>
+                        </div>
+                    </div>
+                    <!-- Active Internships -->
+                    <div class="col-md">
+                        <div class="card glass-card border border-secondary-soft p-3 text-center">
+                            <span class="text-muted fs-8 d-block mb-1">ACTIVE PLACEMENTS</span>
+                            <h3 class="text-primary fw-extrabold mb-0">{{ active_internships }}</h3>
+                        </div>
+                    </div>
+                    <!-- Pending Evaluations -->
+                    <div class="col-md">
+                        <div class="card glass-card border border-secondary-soft p-3 text-center">
+                            <span class="text-muted fs-8 d-block mb-1">PENDING EVALUATIONS</span>
+                            <h3 class="text-info fw-extrabold mb-0">{{ pending_evaluations_count }}</h3>
+                        </div>
+                    </div>
+                    <!-- Completed -->
+                    <div class="col-md">
+                        <div class="card glass-card border border-secondary-soft p-3 text-center">
+                            <span class="text-muted fs-8 d-block mb-1">COMPLETED</span>
+                            <h3 class="text-success fw-extrabold mb-0">{{ completed_internships }}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Tabbed Tables -->
+                <div class="card glass-card border border-secondary-soft p-4">
+                    <ul class="nav nav-tabs border-secondary-soft mb-3" id="facultyTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active text-light bg-transparent border-0 py-2.5 px-3 fs-7 fw-bold" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab" aria-controls="pending" aria-selected="true">
+                                <i class="bi bi-hourglass-split me-1"></i> Pending Approvals ({{ pending_approvals | length }})
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-light bg-transparent border-0 py-2.5 px-3 fs-7 fw-bold" id="evaluations-tab" data-bs-toggle="tab" data-bs-target="#evaluations" type="button" role="tab" aria-controls="evaluations" aria-selected="false">
+                                <i class="bi bi-clipboard-check me-1"></i> Pending Evaluations ({{ pending_evaluations | length }})
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="facultyTabsContent">
+                        <!-- Pending Approvals Tab -->
+                        <div class="tab-pane fade show active" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                            {% if pending_approvals %}
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover border-secondary-soft align-middle fs-7 mb-0">
+                                        <thead>
+                                            <tr class="text-muted">
+                                                <th>Student</th>
+                                                <th>Roll No</th>
+                                                <th>Company</th>
+                                                <th>Role</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for inst in pending_approvals %}
+                                                <tr>
+                                                    <td class="text-white fw-bold">
+                                                        <a href="{{ url_for('faculty.student_detail', student_id=inst.student.id) }}" class="text-white text-decoration-none">
+                                                            {{ inst.student.user.name }}
+                                                        </a>
+                                                    </td>
+                                                    <td>{{ inst.student.roll_no }}</td>
+                                                    <td>{{ inst.company.company_name }}</td>
+                                                    <td>{{ inst.role }}</td>
+                                                    <td class="text-end">
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            <form action="{{ url_for('faculty.approve_internship', internship_id=inst.id) }}" method="POST" class="d-inline">
+                                                                <button type="submit" class="btn btn-success btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                                    Approve <i class="bi bi-check-lg ms-1"></i>
+                                                                </button>
+                                                            </form>
+                                                            <form action="{{ url_for('faculty.reject_internship', internship_id=inst.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to reject this placement?');">
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                                    Reject <i class="bi bi-x-lg ms-1"></i>
+                                                                </button>
+                                                            </form>
+                                                            <a href="{{ url_for('faculty.student_detail', student_id=inst.student.id) }}" class="btn btn-outline-custom btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                                Details <i class="bi bi-eye ms-1"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted text-center py-4 mb-0">No pending placements waiting for approval.</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Pending Evaluations Tab -->
+                        <div class="tab-pane fade" id="evaluations" role="tabpanel" aria-labelledby="evaluations-tab">
+                            {% if pending_evaluations %}
+                                <div class="table-responsive">
+                                    <table class="table table-dark table-hover border-secondary-soft align-middle fs-7 mb-0">
+                                        <thead>
+                                            <tr class="text-muted">
+                                                <th>Student</th>
+                                                <th>Roll No</th>
+                                                <th>Company</th>
+                                                <th>Role</th>
+                                                <th>Status</th>
+                                                <th class="text-end">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for inst in pending_evaluations %}
+                                                <tr>
+                                                    <td class="text-white fw-bold">
+                                                        <a href="{{ url_for('faculty.student_detail', student_id=inst.student.id) }}" class="text-white text-decoration-none">
+                                                            {{ inst.student.user.name }}
+                                                        </a>
+                                                    </td>
+                                                    <td>{{ inst.student.roll_no }}</td>
+                                                    <td>{{ inst.company.company_name }}</td>
+                                                    <td>{{ inst.role }}</td>
+                                                    <td>
+                                                        {% if inst.status == 'approved' %}
+                                                            <span class="badge bg-primary-soft text-primary-gradient rounded-pill border border-primary-soft px-2.5 py-1 fs-8">Approved</span>
+                                                        {% else %}
+                                                            <span class="badge bg-success-soft text-success rounded-pill border border-success-soft px-2.5 py-1 fs-8">Active</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <div class="d-flex justify-content-end gap-2">
+                                                            <a href="{{ url_for('faculty.evaluate_internship', student_id=inst.student_id) }}" class="btn btn-outline-warning btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                                Evaluate <i class="bi bi-clipboard-check ms-1"></i>
+                                                            </a>
+                                                            <a href="{{ url_for('faculty.student_detail', student_id=inst.student.id) }}" class="btn btn-outline-custom btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                                Details <i class="bi bi-eye ms-1"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted text-center py-4 mb-0">No active placements requiring evaluation.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Welcome Widget -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <span class="badge bg-primary-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                                Student Portal
+                            </span>
+                            <h2 class="text-white fw-bold mb-0">Hello, {{ student.user.name }}</h2>
+                            <p class="text-muted fs-7 mb-0">Roll No: <strong class="text-light">{{ student.roll_no }}</strong> | Course: <strong class="text-light">{{ student.course }}</strong></p>
+                        </div>
+                        <div class="text-lg-end">
+                            <span class="badge bg-dark-soft text-muted py-2 px-3 rounded-pill border border-secondary-soft font-monospace">Semester {{ student.semester }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if internship %}
+                    <!-- Internship Status Active Card -->
+                    <div class="card glass-card border border-secondary-soft p-4 p-md-5">
+                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom border-secondary-soft pb-3">
+                            <h4 class="text-white fw-bold mb-0"><i class="bi bi-briefcase text-primary-gradient me-2"></i>My Internship</h4>
+                            {% if internship.status == 'pending' %}
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-1.5 fs-8"><i class="bi bi-hourglass-split me-1"></i> Pending Approval</span>
+                            {% elif internship.status == 'approved' %}
+                                <span class="badge bg-primary-soft text-primary rounded-pill px-3 py-1.5 fs-8"><i class="bi bi-patch-check me-1"></i> Approved</span>
+                            {% elif internship.status == 'active' %}
+                                <span class="badge bg-success-soft text-success rounded-pill px-3 py-1.5 fs-8"><i class="bi bi-dot animate-pulse me-1"></i> Active</span>
+                            {% elif internship.status == 'completed' %}
+                                <span class="badge bg-info-soft text-info rounded-pill px-3 py-1.5 fs-8"><i class="bi bi-award me-1"></i> Completed</span>
+                            {% else %}
+                                <span class="badge bg-danger-soft text-danger rounded-pill px-3 py-1.5 fs-8"><i class="bi bi-x-circle me-1"></i> Rejected</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <small class="text-muted d-block fs-8">EMPLOYER</small>
+                                <span class="text-white fw-bold fs-5">{{ internship.company.company_name }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block fs-8">ROLE</small>
+                                <span class="text-white fw-bold fs-5">{{ internship.role }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block fs-8">DURATION</small>
+                                <span class="text-light fs-6">
+                                    <i class="bi bi-calendar-event text-primary-gradient me-2"></i>{{ internship.start_date.strftime('%b %d, %Y') }} &rarr; {{ internship.end_date.strftime('%b %d, %Y') }}
+                                </span>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block fs-8">INTERNSHIP FORMAT</small>
+                                <span class="badge bg-dark-soft text-light border border-secondary-soft rounded-pill px-3 py-1 fs-8 mt-1">{{ internship.internship_type | upper }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted d-block fs-8">DOCUMENTS SUBMITTED</small>
+                                <a href="{{ url_for('student.manage_documents') }}" class="text-decoration-none">
+                                    <span class="text-white fw-bold fs-6">
+                                        <i class="bi bi-file-earmark-check text-primary-gradient me-2"></i>{{ doc_count }} / 6 Submitted
+                                    </span>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Progress Metric Slider -->
+                        <div class="dashboard-widget p-4 rounded border border-secondary-soft bg-dark-soft mb-4">
+                            <div class="d-flex justify-content-between text-muted fs-8 mb-2">
+                                <span>Milestone Checklist Progress</span>
+                                <span class="fw-bold text-white">{{ progress_percent }}%</span>
+                            </div>
+                            <div class="progress bg-dark-deep" style="height: 10px;">
+                                <div class="progress-bar bg-primary-gradient {% if internship.status == 'active' %}progress-bar-striped progress-bar-animated{% endif %}" role="progressbar" style="width: {{ progress_percent }}%" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Detail Buttons -->
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('student.internship_details', internship_id=internship.id) }}" class="btn btn-primary-gradient rounded-pill px-4">
+                                View Full Details <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- No Internship Registered Card -->
+                    <div class="card glass-card border border-warning-soft p-5 text-center">
+                        <div class="brand-icon-wrapper bg-warning mx-auto mb-4" style="background: rgba(234, 179, 8, 0.1) !important; border: 1px solid var(--border-warning);">
+                            <i class="bi bi-exclamation-triangle brand-icon text-warning"></i>
+                        </div>
+                        
+                        <h3 class="text-white fw-bold mb-2">No Internship Registered</h3>
+                        <p class="text-muted fs-6 mb-4 max-w-600 mx-auto">
+                            To start documenting tasks, submitting reports, and obtaining faculty approvals, you must first register your placement details.
+                        </p>
+                        
+                        <a href="{{ url_for('student.register_internship') }}" class="btn btn-primary-gradient rounded-pill px-4 btn-lg d-inline-flex align-items-center gap-2 mx-auto">
+                            Register Internship <i class="bi bi-plus-circle"></i>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+
+{% block title %}Reports & Analytics Export - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <!-- Breadcrumb & Header Banner -->
+        <div class="card glass-card border border-secondary-soft p-4 mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-1 fs-8">
+                            <li class="breadcrumb-item"><a href="{{ url_for('admin.dashboard') }}" class="text-primary-gradient text-decoration-none">Admin Dashboard</a></li>
+                            <li class="breadcrumb-item active text-muted" aria-current="page">Reports & Export</li>
+                        </ol>
+                    </nav>
+                    <h2 class="text-white fw-bold mb-0">Placement Reports & Data Export</h2>
+                    <p class="text-muted fs-7 mb-0">Generate, preview, and download official institutional records in CSV and PDF formats.</p>
+                </div>
+                <!-- Export Quick Actions -->
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <a href="{{ url_for('admin.export_report', report_type=report_type, export_format='csv', course=selected_course, status=selected_status) }}" class="btn btn-outline-success rounded-pill px-3 shadow-sm hover-lift" id="btnExportCsv">
+                        <i class="bi bi-filetype-csv me-1"></i> Export CSV
+                    </a>
+                    <a href="{{ url_for('admin.export_report', report_type=report_type, export_format='pdf', course=selected_course, status=selected_status) }}" class="btn btn-primary-gradient rounded-pill px-3 shadow-sm hover-lift" id="btnExportPdf">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System KPI Overview (Required Metrics Display) -->
+        <div class="row g-3 mb-4">
+            <!-- Total Students -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1">TOTAL STUDENTS</span>
+                    <h3 class="text-white fw-extrabold mb-0">{{ metrics.total_students }}</h3>
+                </div>
+            </div>
+
+            <!-- Total Internships -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1">TOTAL PLACEMENTS</span>
+                    <h3 class="text-white fw-extrabold mb-0">{{ metrics.total_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Active Internships -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1 text-success">ACTIVE</span>
+                    <h3 class="text-success fw-extrabold mb-0">{{ metrics.active_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Completed Internships -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1 text-info">COMPLETED</span>
+                    <h3 class="text-info fw-extrabold mb-0">{{ metrics.completed_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Pending Internships -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100">
+                    <span class="text-muted fs-8 d-block mb-1 text-warning">PENDING</span>
+                    <h3 class="text-warning fw-extrabold mb-0">{{ metrics.pending_internships }}</h3>
+                </div>
+            </div>
+
+            <!-- Completion Rate -->
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="card glass-card border border-secondary-soft p-3 text-center h-100 bg-primary-soft">
+                    <span class="text-muted fs-8 d-block mb-1 text-white">COMPLETION RATE</span>
+                    <h3 class="text-primary-gradient fw-extrabold mb-0">{{ metrics.completion_rate }}%</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evaluation Score Summary Strip -->
+        <div class="card glass-card border border-secondary-soft p-3 mb-4 d-flex flex-row align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand-icon-wrapper bg-warning-soft rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; min-width: 44px; background: rgba(234, 179, 8, 0.1) !important;">
+                    <i class="bi bi-award text-warning fs-5"></i>
+                </div>
+                <div>
+                    <span class="text-muted fs-8 d-block fw-semibold text-uppercase">Institutional Faculty Evaluation Average</span>
+                    <div class="d-flex align-items-baseline gap-2">
+                        <h4 class="text-white fw-bold mb-0">
+                            {% if metrics.avg_eval_score > 0 %}
+                                {{ metrics.avg_eval_score }} <span class="fs-7 text-muted fw-normal">/ 10</span>
+                            {% else %}
+                                <span class="text-muted fs-7">No evaluations recorded</span>
+                            {% endif %}
+                        </h4>
+                        {% if metrics.avg_eval_score > 0 %}
+                            <span class="badge {% if metrics.avg_eval_score >= 8.0 %}bg-success-soft text-success{% elif metrics.avg_eval_score >= 6.0 %}bg-info-soft text-info{% else %}bg-warning-soft text-warning{% endif %} rounded-pill fs-8">
+                                {% if metrics.avg_eval_score >= 8.0 %}Exemplary Assessment{% elif metrics.avg_eval_score >= 6.0 %}Proficient Assessment{% else %}Developing Assessment{% endif %}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-dark-soft border border-secondary-soft text-muted py-2 px-3 rounded-pill fs-8">
+                    <i class="bi bi-shield-lock me-1 text-success"></i> Authentication & Password Hashes Redacted
+                </span>
+            </div>
+        </div>
+
+        <!-- Report Tabs & Filters Header -->
+        <div class="card glass-card border border-secondary-soft p-3 mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <!-- 4 Report Tabs -->
+                <ul class="nav nav-pills gap-2" id="reportTabs">
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill fs-7 py-2 px-3 {% if report_type == 'completion' %}active bg-primary-gradient text-white{% else %}text-muted hover-white{% endif %}" href="{{ url_for('admin.reports', type='completion', course=selected_course) }}">
+                            <i class="bi bi-check2-circle me-1"></i> 1. Internship Completion
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill fs-7 py-2 px-3 {% if report_type == 'students' %}active bg-primary-gradient text-white{% else %}text-muted hover-white{% endif %}" href="{{ url_for('admin.reports', type='students', course=selected_course) }}">
+                            <i class="bi bi-people me-1"></i> 2. Student Directory
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill fs-7 py-2 px-3 {% if report_type == 'companies' %}active bg-primary-gradient text-white{% else %}text-muted hover-white{% endif %}" href="{{ url_for('admin.reports', type='companies', course=selected_course) }}">
+                            <i class="bi bi-building me-1"></i> 3. Company Statistics
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link rounded-pill fs-7 py-2 px-3 {% if report_type == 'evaluations' %}active bg-primary-gradient text-white{% else %}text-muted hover-white{% endif %}" href="{{ url_for('admin.reports', type='evaluations', course=selected_course) }}">
+                            <i class="bi bi-journal-check me-1"></i> 4. Evaluation Summary
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Filter Form -->
+                <form method="GET" action="{{ url_for('admin.reports') }}" class="d-flex align-items-center gap-2 flex-wrap">
+                    <input type="hidden" name="type" value="{{ report_type }}">
+                    
+                    <!-- Course Filter (Applicable to all except company) -->
+                    {% if report_type != 'companies' %}
+                        <select name="course" class="form-select form-select-sm glass-card border-secondary-soft text-white" style="width: auto; min-width: 150px;" onchange="this.form.submit()">
+                            <option value="">All Courses</option>
+                            {% for c in available_courses %}
+                                <option value="{{ c }}" {% if selected_course == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+
+                    <!-- Status Filter (For Completion report) -->
+                    {% if report_type == 'completion' %}
+                        <select name="status" class="form-select form-select-sm glass-card border-secondary-soft text-white" style="width: auto; min-width: 140px;" onchange="this.form.submit()">
+                            <option value="">All Statuses</option>
+                            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                            <option value="approved" {% if selected_status == 'approved' %}selected{% endif %}>Approved</option>
+                            <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="rejected" {% if selected_status == 'rejected' %}selected{% endif %}>Rejected</option>
+                        </select>
+                    {% endif %}
+
+                    {% if selected_course or selected_status %}
+                        <a href="{{ url_for('admin.reports', type=report_type) }}" class="btn btn-sm btn-outline-secondary rounded-pill" title="Reset Filters">
+                            <i class="bi bi-x-circle"></i> Reset
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+
+        <!-- Active Report Table Preview -->
+        <div class="card glass-card border border-secondary-soft p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h5 class="text-white fw-bold mb-0">
+                        {% if report_type == 'completion' %}
+                            <i class="bi bi-check2-circle text-primary me-2"></i>Internship Completion Report
+                        {% elif report_type == 'students' %}
+                            <i class="bi bi-people text-primary me-2"></i>Student Internship Report
+                        {% elif report_type == 'companies' %}
+                            <i class="bi bi-building text-primary me-2"></i>Company Internship Report
+                        {% elif report_type == 'evaluations' %}
+                            <i class="bi bi-journal-check text-primary me-2"></i>Faculty Evaluation Summary
+                        {% endif %}
+                    </h5>
+                    <p class="text-muted fs-8 mb-0">Showing {{ report_data|length }} database records</p>
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('admin.export_report', report_type=report_type, export_format='csv', course=selected_course, status=selected_status) }}" class="btn btn-sm btn-dark-soft border border-secondary-soft text-white rounded-pill px-3">
+                        <i class="bi bi-download me-1 text-success"></i> CSV
+                    </a>
+                    <a href="{{ url_for('admin.export_report', report_type=report_type, export_format='pdf', course=selected_course, status=selected_status) }}" class="btn btn-sm btn-dark-soft border border-secondary-soft text-white rounded-pill px-3">
+                        <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> PDF
+                    </a>
+                </div>
+            </div>
+
+            {% if report_data %}
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover align-middle mb-0 custom-table">
+                        <!-- 1. Completion Report Table -->
+                        {% if report_type == 'completion' %}
+                            <thead>
+                                <tr class="text-muted fs-8 text-uppercase">
+                                    <th>ID</th>
+                                    <th>Student</th>
+                                    <th>Roll No</th>
+                                    <th>Course</th>
+                                    <th>Company</th>
+                                    <th>Role</th>
+                                    <th>Timeline</th>
+                                    <th>Duration</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in report_data %}
+                                    <tr>
+                                        <td class="text-muted fs-8">#{{ r.id }}</td>
+                                        <td><span class="text-white fw-semibold">{{ r.student_name }}</span></td>
+                                        <td><span class="badge bg-dark-soft border border-secondary-soft text-light">{{ r.roll_no }}</span></td>
+                                        <td class="text-muted fs-8">{{ r.course }}</td>
+                                        <td class="text-white">{{ r.company }}</td>
+                                        <td class="text-muted">{{ r.role }}</td>
+                                        <td class="text-muted fs-8">{{ r.start_date }} &rarr; {{ r.end_date }}</td>
+                                        <td><span class="badge bg-secondary-soft text-light">{{ r.duration }}</span></td>
+                                        <td>
+                                            {% if r.status == 'Completed' %}
+                                                <span class="badge bg-success-soft text-success rounded-pill px-2">Completed</span>
+                                            {% elif r.status == 'Active' %}
+                                                <span class="badge bg-primary-soft text-primary rounded-pill px-2">Active</span>
+                                            {% elif r.status == 'Pending' %}
+                                                <span class="badge bg-warning-soft text-warning rounded-pill px-2">Pending</span>
+                                            {% elif r.status == 'Approved' %}
+                                                <span class="badge bg-info-soft text-info rounded-pill px-2">Approved</span>
+                                            {% else %}
+                                                <span class="badge bg-danger-soft text-danger rounded-pill px-2">{{ r.status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        <!-- 2. Student Directory Table -->
+                        {% elif report_type == 'students' %}
+                            <thead>
+                                <tr class="text-muted fs-8 text-uppercase">
+                                    <th>Roll No</th>
+                                    <th>Student Name</th>
+                                    <th>Course</th>
+                                    <th>Semester</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Placements</th>
+                                    <th>Latest Enterprise</th>
+                                    <th>Latest Role</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in report_data %}
+                                    <tr>
+                                        <td><span class="badge bg-dark-soft border border-secondary-soft text-light fw-bold">{{ r.roll_no }}</span></td>
+                                        <td><span class="text-white fw-semibold">{{ r.student_name }}</span></td>
+                                        <td class="text-muted fs-8">{{ r.course }}</td>
+                                        <td class="text-muted fs-8">Sem {{ r.semester }}</td>
+                                        <td class="text-muted fs-8">{{ r.email }}</td>
+                                        <td class="text-muted fs-8">{{ r.phone }}</td>
+                                        <td><span class="badge bg-primary-soft text-primary">{{ r.internship_count }}</span></td>
+                                        <td class="text-white">{{ r.latest_company }}</td>
+                                        <td class="text-muted">{{ r.latest_role }}</td>
+                                        <td>
+                                            {% if r.latest_status == 'Completed' %}
+                                                <span class="badge bg-success-soft text-success rounded-pill px-2">Completed</span>
+                                            {% elif r.latest_status == 'Active' %}
+                                                <span class="badge bg-primary-soft text-primary rounded-pill px-2">Active</span>
+                                            {% elif r.latest_status == 'Not Registered' %}
+                                                <span class="badge bg-secondary-soft text-muted rounded-pill px-2">Not Registered</span>
+                                            {% else %}
+                                                <span class="badge bg-info-soft text-info rounded-pill px-2">{{ r.latest_status }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        <!-- 3. Company Statistics Table -->
+                        {% elif report_type == 'companies' %}
+                            <thead>
+                                <tr class="text-muted fs-8 text-uppercase">
+                                    <th>ID</th>
+                                    <th>Company Name</th>
+                                    <th>Contact Person</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Industry</th>
+                                    <th>Total Placements</th>
+                                    <th>Active</th>
+                                    <th>Completed</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in report_data %}
+                                    <tr>
+                                        <td class="text-muted fs-8">#{{ r.id }}</td>
+                                        <td><span class="text-white fw-semibold"><i class="bi bi-building me-1 text-primary"></i> {{ r.company_name }}</span></td>
+                                        <td class="text-light">{{ r.contact_person }}</td>
+                                        <td class="text-muted fs-8">{{ r.email }}</td>
+                                        <td class="text-muted fs-8">{{ r.phone }}</td>
+                                        <td><span class="badge bg-secondary-soft text-light">{{ r.industry }}</span></td>
+                                        <td><span class="badge bg-primary-soft text-primary fw-bold">{{ r.total_placements }}</span></td>
+                                        <td><span class="badge bg-success-soft text-success">{{ r.active_placements }}</span></td>
+                                        <td><span class="badge bg-info-soft text-info">{{ r.completed_placements }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+
+                        <!-- 4. Evaluation Summary Table -->
+                        {% elif report_type == 'evaluations' %}
+                            <thead>
+                                <tr class="text-muted fs-8 text-uppercase">
+                                    <th>ID</th>
+                                    <th>Student</th>
+                                    <th>Roll No</th>
+                                    <th>Evaluator</th>
+                                    <th>Company / Role</th>
+                                    <th>Tech</th>
+                                    <th>Comm</th>
+                                    <th>Punct</th>
+                                    <th>Work</th>
+                                    <th>Disc</th>
+                                    <th>Overall</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for r in report_data %}
+                                    <tr>
+                                        <td class="text-muted fs-8">#{{ r.id }}</td>
+                                        <td><span class="text-white fw-semibold">{{ r.student_name }}</span></td>
+                                        <td><span class="badge bg-dark-soft border border-secondary-soft text-light">{{ r.roll_no }}</span></td>
+                                        <td class="text-light"><i class="bi bi-person-badge me-1 text-warning"></i> {{ r.faculty_name }}</td>
+                                        <td class="text-muted fs-8">{{ r.company }} ({{ r.role }})</td>
+                                        <td class="text-muted fs-8">{{ r.technical_skills }}</td>
+                                        <td class="text-muted fs-8">{{ r.communication }}</td>
+                                        <td class="text-muted fs-8">{{ r.punctuality }}</td>
+                                        <td class="text-muted fs-8">{{ r.work_quality }}</td>
+                                        <td class="text-muted fs-8">{{ r.discipline }}</td>
+                                        <td>
+                                            <span class="badge bg-warning-soft text-warning fw-extrabold fs-7">{{ r.overall_score }}</span>
+                                        </td>
+                                        <td class="text-muted fs-8">{{ r.evaluated_date }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        {% endif %}
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="brand-icon-wrapper bg-dark-soft mx-auto mb-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-inbox text-muted fs-4" style="line-height: 50px;"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-1">No Records Found</h5>
+                    <p class="text-muted fs-7 mb-3">No database records match the selected report type and filters.</p>
+                    <a href="{{ url_for('admin.reports', type=report_type) }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+                        Reset Filters
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

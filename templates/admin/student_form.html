@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Student - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Back Link -->
+                <div class="mb-4 text-start">
+                    <a href="{{ url_for('admin.list_students') }}" class="btn btn-outline-custom rounded-pill px-4 fs-7 py-2">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Students
+                    </a>
+                </div>
+
+                <div class="card glass-card border border-secondary-soft p-4 p-md-5">
+                    <div class="border-bottom border-secondary-soft pb-3 mb-4 text-start">
+                        <span class="badge bg-primary-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                            Student Management
+                        </span>
+                        <h3 class="text-white fw-bold mb-1">{{ action }} Student</h3>
+                        <p class="text-muted fs-7 mb-0">Fill in the fields to configure the student profile.</p>
+                    </div>
+
+                    <form method="POST" class="text-start">
+                        <!-- Full Name -->
+                        <div class="mb-3">
+                            <label for="name" class="form-label text-light fs-7 fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="name" name="name" required value="{% if student %}{{ student.user.name }}{% endif %}">
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label text-light fs-7 fw-semibold">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control bg-dark-soft border-secondary-soft text-white" id="email" name="email" required value="{% if student %}{{ student.user.email }}{% endif %}">
+                        </div>
+
+                        <!-- Password (Required on Add, Omitted on Edit) -->
+                        {% if action == 'Add' %}
+                            <div class="mb-3">
+                                <label for="password" class="form-label text-light fs-7 fw-semibold">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control bg-dark-soft border-secondary-soft text-white" id="password" name="password" required placeholder="Minimum 6 characters...">
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            <!-- Roll Number -->
+                            <div class="col-md-6 mb-3">
+                                <label for="roll_no" class="form-label text-light fs-7 fw-semibold">Roll Number <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="roll_no" name="roll_no" required value="{% if student %}{{ student.roll_no }}{% endif %}">
+                            </div>
+
+                            <!-- Course -->
+                            <div class="col-md-6 mb-3">
+                                <label for="course" class="form-label text-light fs-7 fw-semibold">Course <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="course" name="course" placeholder="e.g. CS, IT, ECE" required value="{% if student %}{{ student.course }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <!-- Semester -->
+                            <div class="col-md-6 mb-3">
+                                <label for="semester" class="form-label text-light fs-7 fw-semibold">Semester <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control bg-dark-soft border-secondary-soft text-white" id="semester" name="semester" min="1" max="8" required value="{% if student %}{{ student.semester }}{% endif %}">
+                            </div>
+
+                            <!-- Phone -->
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label text-light fs-7 fw-semibold">Phone (Optional)</label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="phone" name="phone" value="{% if student and student.phone %}{{ student.phone }}{% endif %}">
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill mt-4 py-2.5 fw-bold">
+                            Save Student Profile <i class="bi bi-save ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

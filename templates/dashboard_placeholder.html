@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ role_name }} Portal - Coming Soon{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-10">
+                <div class="card glass-card border border-secondary-soft shadow-lg p-5 text-center">
+                    <span class="badge bg-primary-soft text-primary-gradient mb-4 py-2.5 px-4 rounded-pill border border-primary-soft fw-semibold d-inline-block mx-auto">
+                        <i class="bi bi-clock-history me-2"></i>Module Under Construction
+                    </span>
+                    
+                    <h2 class="text-white fw-bold mb-3">{{ role_name }} Portal Dashboard</h2>
+                    <p class="text-muted fs-6 mb-4 max-w-600 mx-auto">
+                        You have successfully authenticated as a <strong>{{ role_name }}</strong>. 
+                        The customized dashboard views, metrics charts, logs, and evaluation reports are scheduled for Step 4.
+                    </p>
+                    
+                    <div class="dashboard-widget p-4 rounded border border-secondary-soft bg-dark-soft mb-4 text-start">
+                        <h6 class="text-white fw-bold mb-3"><i class="bi bi-shield-check text-primary-gradient me-2"></i>Active Session Data</h6>
+                        <div class="row g-3 fs-7">
+                            <div class="col-md-6">
+                                <span class="text-muted">User ID:</span> <span class="text-white font-monospace">{{ session.get('user_id') }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted">Authenticated Role:</span> <span class="badge bg-success-soft text-success rounded-pill px-2.5">{{ session.get('role') | upper }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted">Full Name:</span> <span class="text-white">{{ session.get('user_name') }}</span>
+                            </div>
+                            <div class="col-md-6">
+                                <span class="text-muted">Security Check:</span> <span class="text-success"><i class="bi bi-patch-check-fill me-1"></i> Authorized</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-custom rounded-pill px-4">
+                            <i class="bi bi-house-door me-2"></i> Go to Homepage
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-primary-gradient rounded-pill px-4">
+                            Log Out <i class="bi bi-box-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

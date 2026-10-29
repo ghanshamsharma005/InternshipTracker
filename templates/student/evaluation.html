@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}My Evaluation - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                
+                <!-- Welcome/Header Widget -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <span class="badge bg-primary-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                                Academic Evaluation
+                            </span>
+                            <h2 class="text-white fw-bold mb-0">Placement Assessment</h2>
+                            <p class="text-muted fs-7 mb-0">Employer: <strong class="text-light">{{ internship.company.company_name }}</strong> | Role: <strong class="text-light">{{ internship.role }}</strong></p>
+                        </div>
+                        <div class="text-lg-end">
+                            <span class="badge bg-dark-soft text-light py-2 px-3 rounded-pill border border-secondary-soft font-monospace">ROLL: {{ student.roll_no }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if evaluation %}
+                    <!-- Evaluation Result Panel -->
+                    <div class="card glass-card border border-secondary-soft p-4 p-md-5 mb-4">
+                        <div class="row g-4 align-items-center border-bottom border-secondary-soft pb-4 mb-4">
+                            <div class="col-md-6 text-center text-md-start">
+                                <h4 class="text-white fw-bold mb-1">Evaluation Details</h4>
+                                <p class="text-muted fs-7 mb-0">Assessment submitted by faculty advisor.</p>
+                                <p class="text-muted fs-8 mt-1">Evaluated on: <span class="text-light font-monospace">{{ evaluation.evaluated_at.strftime('%B %d, %Y') }}</span></p>
+                            </div>
+                            <!-- Overall Score Card -->
+                            <div class="col-md-6">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 text-center">
+                                    <small class="text-muted fs-8 mb-1">OVERALL ASSESSMENT SCORE</small>
+                                    <h2 class="text-white fw-extrabold mb-0 font-monospace">{{ "%.1f"|format(evaluation.overall_score) }} / 10.0</h2>
+                                    {% if evaluation.overall_score >= 9.0 %}
+                                        <span class="badge bg-success-soft text-success mt-2 py-1 px-3 rounded-pill border border-success-soft fw-semibold fs-8 mx-auto">Outstanding (A+)</span>
+                                    {% elif evaluation.overall_score >= 7.5 %}
+                                        <span class="badge bg-primary-soft text-primary-gradient mt-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8 mx-auto">Exceeds Expectations (A)</span>
+                                    {% elif evaluation.overall_score >= 6.0 %}
+                                        <span class="badge bg-info-soft text-info mt-2 py-1 px-3 rounded-pill border border-info-soft fw-semibold fs-8 mx-auto">Meets Expectations (B)</span>
+                                    {% elif evaluation.overall_score >= 4.0 %}
+                                        <span class="badge bg-warning-soft text-warning mt-2 py-1 px-3 rounded-pill border border-warning-soft fw-semibold fs-8 mx-auto">Needs Improvement (C)</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-soft text-danger mt-2 py-1 px-3 rounded-pill border border-danger-soft fw-semibold fs-8 mx-auto">Unsatisfactory (F)</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rubrics Detail List -->
+                        <h5 class="text-white fw-bold mb-4"><i class="bi bi-bar-chart-steps text-primary-gradient me-2"></i>Performance Rubrics</h5>
+                        <div class="row g-4 mb-4">
+                            <!-- Technical Skills -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between text-muted fs-7 mb-1.5">
+                                    <span class="text-light fw-medium">Technical Skills</span>
+                                    <span class="fw-bold text-white">{{ evaluation.technical_skills }} / 10</span>
+                                </div>
+                                <div class="progress bg-dark-deep" style="height: 6px;">
+                                    <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ evaluation.technical_skills * 10 }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Communication -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between text-muted fs-7 mb-1.5">
+                                    <span class="text-light fw-medium">Communication</span>
+                                    <span class="fw-bold text-white">{{ evaluation.communication }} / 10</span>
+                                </div>
+                                <div class="progress bg-dark-deep" style="height: 6px;">
+                                    <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ evaluation.communication * 10 }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Punctuality -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between text-muted fs-7 mb-1.5">
+                                    <span class="text-light fw-medium">Punctuality & Attendance</span>
+                                    <span class="fw-bold text-white">{{ evaluation.punctuality }} / 10</span>
+                                </div>
+                                <div class="progress bg-dark-deep" style="height: 6px;">
+                                    <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ evaluation.punctuality * 10 }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Work Quality -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between text-muted fs-7 mb-1.5">
+                                    <span class="text-light fw-medium">Quality of Deliverables</span>
+                                    <span class="fw-bold text-white">{{ evaluation.work_quality }} / 10</span>
+                                </div>
+                                <div class="progress bg-dark-deep" style="height: 6px;">
+                                    <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ evaluation.work_quality * 10 }}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- Discipline -->
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between text-muted fs-7 mb-1.5">
+                                    <span class="text-light fw-medium">Professional Conduct & Discipline</span>
+                                    <span class="fw-bold text-white">{{ evaluation.discipline }} / 10</span>
+                                </div>
+                                <div class="progress bg-dark-deep" style="height: 6px;">
+                                    <div class="progress-bar bg-primary-gradient" role="progressbar" style="width: {{ evaluation.discipline * 10 }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Section -->
+                        <div class="mt-5 p-4 rounded bg-dark-soft border border-secondary-soft">
+                            <h6 class="text-white fw-bold mb-2"><i class="bi bi-chat-left-quote text-primary-gradient me-2"></i>Faculty Advisor Remarks</h6>
+                            {% if evaluation.feedback %}
+                                <p class="text-light fs-7 mb-0 italic-quote font-sans">"{{ evaluation.feedback }}"</p>
+                            {% else %}
+                                <p class="text-muted fs-7 mb-0">No written feedback was provided by the advisor.</p>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                {% else %}
+                    <!-- Evaluation Pending Placeholder -->
+                    <div class="card glass-card border border-warning-soft p-5 text-center">
+                        <div class="brand-icon-wrapper bg-warning mx-auto mb-4" style="background: rgba(234, 179, 8, 0.1) !important; border: 1px solid rgba(234, 179, 8, 0.2);">
+                            <i class="bi bi-clipboard-x brand-icon text-warning"></i>
+                        </div>
+                        <h3 class="text-white fw-bold mb-2">Evaluation Pending</h3>
+                        <p class="text-muted fs-6 mb-0 max-w-600 mx-auto">
+                            Your faculty advisor has not submitted your placement evaluation yet. Once graded, your detailed rubric scores and advisor feedback remarks will be displayed here.
+                        </p>
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Placement Profile - Faculty Portal{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-100">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <!-- Back Link -->
+        <div class="mb-4">
+            <a href="{{ url_for('faculty.list_students') }}" class="btn btn-outline-custom rounded-pill px-4 fs-7 py-2">
+                <i class="bi bi-arrow-left me-2"></i> Back to Placements
+            </a>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Side: Student Info, Internship Placement, Timeline -->
+            <div class="col-lg-5 col-md-12">
+                <!-- Student Info Card -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <h4 class="text-white fw-bold mb-3"><i class="bi bi-person text-primary-gradient me-2"></i>Student Details</h4>
+                    <div class="table-responsive">
+                        <table class="table table-dark table-borderless fs-7 mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-muted w-35">Name:</td>
+                                    <td class="text-white fw-bold">{{ student.user.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Email:</td>
+                                    <td>{{ student.user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Roll No:</td>
+                                    <td class="font-monospace text-light">{{ student.roll_no }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Course:</td>
+                                    <td>{{ student.course }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Semester:</td>
+                                    <td>Semester {{ student.semester }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Internship Placement Card -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <h4 class="text-white fw-bold mb-3"><i class="bi bi-briefcase text-primary-gradient me-2"></i>Placement Details</h4>
+                    {% if internship %}
+                        <div class="table-responsive mb-3">
+                            <table class="table table-dark table-borderless fs-7 mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted w-35">Company:</td>
+                                        <td class="text-white fw-bold">{{ internship.company.company_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Role:</td>
+                                        <td>{{ internship.role }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Start Date:</td>
+                                        <td>{{ internship.start_date.strftime('%b %d, %Y') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">End Date:</td>
+                                        <td>{{ internship.end_date.strftime('%b %d, %Y') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">Status:</td>
+                                        <td>
+                                            {% if internship.status == 'pending' %}
+                                                <span class="badge bg-warning-soft text-warning border border-warning-soft rounded-pill px-2.5 py-1 fs-8">Pending</span>
+                                            {% elif internship.status == 'approved' %}
+                                                <span class="badge bg-primary-soft text-primary-gradient border border-primary-soft rounded-pill px-2.5 py-1 fs-8">Approved</span>
+                                            {% elif internship.status == 'active' %}
+                                                <span class="badge bg-success-soft text-success border border-success-soft rounded-pill px-2.5 py-1 fs-8">Active</span>
+                                            {% elif internship.status == 'completed' %}
+                                                <span class="badge bg-info-soft text-info border border-info-soft rounded-pill px-2.5 py-1 fs-8">Completed</span>
+                                            {% else %}
+                                                <span class="badge bg-danger-soft text-danger border border-danger-soft rounded-pill px-2.5 py-1 fs-8">Rejected</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Actions on Placement -->
+                        {% if internship.status == 'pending' %}
+                            <div class="d-flex gap-2">
+                                <form action="{{ url_for('faculty.approve_internship', internship_id=internship.id) }}" method="POST" class="w-100">
+                                    <button type="submit" class="btn btn-success btn-sm w-100 rounded-pill py-2">
+                                        Approve Placement <i class="bi bi-check-lg ms-1"></i>
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('faculty.reject_internship', internship_id=internship.id) }}" method="POST" class="w-100" onsubmit="return confirm('Are you sure you want to reject this placement?');">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-pill py-2">
+                                        Reject <i class="bi bi-x-lg ms-1"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-muted fs-7 mb-0">Student has not registered placement details yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Timeline Milestones -->
+                <div class="card glass-card border border-secondary-soft p-4">
+                    <h4 class="text-white fw-bold mb-4"><i class="bi bi-calendar-range text-primary-gradient me-2"></i>Timeline Milestones</h4>
+                    {% if timeline_events %}
+                        <div class="timeline-container">
+                            {% for ev in timeline_events %}
+                                <div class="timeline-item pb-4 position-relative">
+                                    <div class="timeline-icon position-absolute rounded-circle d-flex align-items-center justify-content-center" style="left: -12px; top: 0; width: 24px; height: 24px; z-index: 2; background-color: {% if ev.status == 'completed' %}#28a745{% elif ev.status == 'in_progress' %}#ffc107{% else %}#343a40{% endif %}; border: 3px solid #1a1e29;">
+                                        {% if ev.status == 'completed' %}
+                                            <i class="bi bi-check-lg text-white" style="font-size: 0.7rem;"></i>
+                                        {% elif ev.status == 'in_progress' %}
+                                            <i class="bi bi-arrow-repeat text-white spin" style="font-size: 0.7rem;"></i>
+                                        {% else %}
+                                            <i class="bi bi-circle text-muted" style="font-size: 0.5rem;"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ps-4">
+                                        <h5 class="text-white fw-bold fs-7 mb-1">{{ ev.title }}</h5>
+                                        <p class="text-muted fs-8 mb-1">{{ ev.description }}</p>
+                                        <span class="badge bg-dark-soft text-light border border-secondary-soft rounded-pill px-2.5 py-0.5 fs-8">
+                                            {{ ev.status | capitalize }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted fs-7 mb-0">Timeline is not active yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right Side: Progress Reports, Documents, Deadlines -->
+            <div class="col-lg-7 col-md-12">
+                <!-- Progress Reports -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="text-white fw-bold mb-0"><i class="bi bi-journal-check text-primary-gradient me-2"></i>Weekly Progress Logs</h4>
+                        <span class="badge bg-primary-soft text-primary-gradient border border-primary-soft rounded-pill px-3 py-1 fs-8 fw-bold">{{ progress_percent }}% Progress</span>
+                    </div>
+                    
+                    {% if progress_reports %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for report in progress_reports %}
+                                <div class="p-3 bg-dark-soft border border-secondary-soft rounded-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-white fw-bold fs-7">Week {{ report.week_number }} Log</span>
+                                        <small class="text-muted fs-8">Submitted: {{ report.submitted_at.strftime('%b %d, %Y') }}</small>
+                                    </div>
+                                    <p class="text-muted fs-7 mb-2"><strong>Tasks Completed:</strong> {{ report.tasks_completed }}</p>
+                                    <p class="text-muted fs-7 mb-2"><strong>Hours Worked:</strong> <span class="text-white fw-semibold">{{ report.hours_worked }}h</span></p>
+                                    
+                                    {% if report.skills_learned %}
+                                        <p class="text-muted fs-7 mb-2"><strong>Skills:</strong> {{ report.skills_learned }}</p>
+                                    {% endif %}
+                                    {% if report.challenges %}
+                                        <p class="text-muted fs-7 mb-2"><strong>Challenges:</strong> {{ report.challenges }}</p>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center border-top border-secondary-soft pt-2 mt-2">
+                                        <div>
+                                            {% if report.report_file %}
+                                                <a href="/uploads/{{ report.report_file }}" target="_blank" class="btn btn-sm btn-outline-custom rounded-pill px-2.5 py-1 fs-8">
+                                                    <i class="bi bi-file-earmark-arrow-down me-1"></i> Attachment
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Comments/Feedback Section -->
+                                        <div>
+                                            {% if report.feedback %}
+                                                <span class="text-success fs-8 fw-semibold"><i class="bi bi-patch-check-fill me-1"></i> Reviewed:</span>
+                                                <small class="text-muted fs-8 font-italic">"{{ report.feedback }}"</small>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-outline-custom rounded-pill px-3 py-1 fs-8" type="button" data-bs-toggle="collapse" data-bs-target="#commentForm-{{ report.id }}" aria-expanded="false">
+                                                    Add Feedback <i class="bi bi-chat-left-dots ms-1"></i>
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Collapsible Comment Form -->
+                                    <div class="collapse mt-3" id="commentForm-{{ report.id }}">
+                                        <form action="{{ url_for('faculty.comment_progress', report_id=report.id) }}" method="POST" class="p-3 bg-dark-deep rounded-3 border border-secondary-soft">
+                                            <label class="form-label text-white fs-8 fw-bold mb-1">Feedback Remarks</label>
+                                            <textarea name="feedback" rows="2" class="form-control bg-dark-soft text-white border-secondary-soft fs-8 mb-2" placeholder="Submit remarks and mark reviewed..." required></textarea>
+                                            <div class="text-end">
+                                                <button type="submit" class="btn btn-primary-gradient btn-sm rounded-pill px-3 py-1.5 fs-8">Submit Feedback</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4 mb-0">No weekly progress logs submitted yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Submitted Documents -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <h4 class="text-white fw-bold mb-3"><i class="bi bi-file-earmark-text text-primary-gradient me-2"></i>Internship Documents</h4>
+                    {% if docs_map %}
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover border-secondary-soft align-middle fs-7 mb-0">
+                                <thead>
+                                    <tr class="text-muted">
+                                        <th>Document Type</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Verification Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for req_doc in required_docs %}
+                                        {% set doc = docs_map.get(req_doc) %}
+                                        <tr>
+                                            <td class="text-white fw-bold">{{ req_doc }}</td>
+                                            <td>
+                                                {% if doc %}
+                                                    {% if doc.status == 'verified' %}
+                                                        <span class="badge bg-success-soft text-success rounded-pill border border-success-soft px-2 py-0.5 fs-8">Verified</span>
+                                                    {% elif doc.status == 'rejected' %}
+                                                        <span class="badge bg-danger-soft text-danger rounded-pill border border-danger-soft px-2 py-0.5 fs-8">Rejected</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning-soft text-warning rounded-pill border border-warning-soft px-2 py-0.5 fs-8">Pending</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-dark-soft text-muted rounded-pill border border-secondary-soft px-2 py-0.5 fs-8">Not Uploaded</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                {% if doc %}
+                                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                                        <a href="{{ url_for('student.view_document', document_id=doc.id) }}" target="_blank" class="btn btn-sm btn-outline-custom rounded-pill px-2.5 py-1 fs-8">
+                                                            View
+                                                        </a>
+                                                        
+                                                        {% if doc.status == 'pending' %}
+                                                            <form action="{{ url_for('faculty.verify_document', document_id=doc.id) }}" method="POST" class="d-inline">
+                                                                <button type="submit" class="btn btn-sm btn-success rounded-pill px-2.5 py-1 fs-8">
+                                                                    Verify
+                                                                </button>
+                                                            </form>
+                                                            <form action="{{ url_for('faculty.reject_document', document_id=doc.id) }}" method="POST" class="d-inline">
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 fs-8">
+                                                                    Reject
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted fs-8">-</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4 mb-0">No documents uploaded yet.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Deadlines list -->
+                <div class="card glass-card border border-secondary-soft p-4">
+                    <h4 class="text-white fw-bold mb-3"><i class="bi bi-clock text-primary-gradient me-2"></i>Milestone Deadlines</h4>
+                    {% if deadlines %}
+                        <div class="table-responsive">
+                            <table class="table table-dark border-secondary-soft align-middle fs-7 mb-0">
+                                <thead>
+                                    <tr class="text-muted">
+                                        <th>Milestone</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th class="text-end">Days Remaining</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dl in deadlines %}
+                                        <tr>
+                                            <td class="text-white fw-bold">{{ dl.title }}</td>
+                                            <td>{{ dl.due_date.strftime('%b %d, %Y') }}</td>
+                                            <td>
+                                                {% if dl.status == 'Completed' %}
+                                                    <span class="badge bg-success-soft text-success rounded-pill border border-success-soft px-2 py-0.5 fs-8">Completed</span>
+                                                {% elif dl.status == 'Due Today' %}
+                                                    <span class="badge bg-primary text-white rounded-pill px-2 py-0.5 fs-8">Due Today</span>
+                                                {% elif dl.status == 'Overdue' %}
+                                                    <span class="badge bg-danger-soft text-danger rounded-pill border border-danger-soft px-2 py-0.5 fs-8">Overdue</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning-soft text-warning rounded-pill border border-warning-soft px-2 py-0.5 fs-8">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="text-end">
+                                                {% if dl.status == 'Completed' %}
+                                                    <span class="text-success fs-8">Completed</span>
+                                                {% elif dl.status == 'Due Today' %}
+                                                    <span class="text-warning fs-8">Today</span>
+                                                {% elif dl.status == 'Overdue' %}
+                                                    <span class="text-danger fs-8">Lapsed</span>
+                                                {% else %}
+                                                    <span class="text-white fw-semibold">{{ dl.days_remaining }} days</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4 mb-0">No active deadlines found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

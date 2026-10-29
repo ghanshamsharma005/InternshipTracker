@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Internship Deadlines - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <!-- Welcome/Status Card -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <div class="d-flex align-items-center">
+                        <div class="brand-icon-wrapper me-3">
+                            <i class="bi bi-calendar-check brand-icon text-white"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary-soft text-primary-gradient mb-1 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                                Schedule Tracker
+                            </span>
+                            <h3 class="text-white fw-bold mb-0">Internship Deadlines</h3>
+                            <p class="text-muted fs-7 mb-0">Keep track of crucial milestone due dates to ensure timely completions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deadlines List -->
+                <div class="d-flex flex-column gap-3">
+                    {% if deadlines %}
+                        {% for dl in deadlines %}
+                            <div class="card glass-card border border-secondary-soft p-4 d-flex flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <h4 class="text-white fw-bold mb-0 fs-6">{{ dl.title }}</h4>
+                                        
+                                        <!-- Computed Status Badge -->
+                                        {% if dl.status == 'Completed' %}
+                                            <span class="badge bg-success-soft text-success rounded-pill border border-success-soft px-2.5 py-0.5 fs-8">
+                                                Completed
+                                            </span>
+                                        {% elif dl.status == 'Due Today' %}
+                                            <span class="badge bg-primary text-white rounded-pill px-2.5 py-0.5 fs-8 animate-pulse">
+                                                Due Today
+                                            </span>
+                                        {% elif dl.status == 'Overdue' %}
+                                            <span class="badge bg-danger-soft text-danger rounded-pill border border-danger-soft px-2.5 py-0.5 fs-8">
+                                                Overdue
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning-soft text-warning rounded-pill border border-warning-soft px-2.5 py-0.5 fs-8">
+                                                Pending
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-muted fs-7 mb-0">{{ dl.description }}</p>
+                                    <small class="text-light-soft fs-8 mt-2 d-block">
+                                        <i class="bi bi-calendar-event me-1"></i> Due Date: <strong class="text-white">{{ dl.due_date.strftime('%B %d, %Y') }}</strong>
+                                    </small>
+                                </div>
+                                
+                                <div class="text-md-end bg-dark-soft border border-secondary-soft p-3 rounded-3" style="min-width: 160px;">
+                                    {% if dl.status == 'Completed' %}
+                                        <span class="text-success fs-8 fw-semibold d-block"><i class="bi bi-check-circle-fill me-1"></i> Fulfilled</span>
+                                    {% elif dl.status == 'Due Today' %}
+                                        <span class="text-warning fs-8 fw-semibold d-block"><i class="bi bi-exclamation-triangle-fill me-1"></i> Action Required</span>
+                                        <small class="text-white fs-7 fw-bold d-block mt-1">Today</small>
+                                    {% elif dl.status == 'Overdue' %}
+                                        <span class="text-danger fs-8 fw-semibold d-block"><i class="bi bi-x-circle-fill me-1"></i> Overdue</span>
+                                        <small class="text-danger fs-7 fw-bold d-block mt-1">Lapsed</small>
+                                    {% else %}
+                                        <span class="text-muted fs-8 d-block">Time Remaining</span>
+                                        <small class="text-white fs-6 fw-bold d-block mt-1">{{ dl.days_remaining }} days</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="card glass-card border border-secondary-soft p-5 text-center">
+                            <p class="text-muted mb-0 fs-7">No deadlines found. Please ensure your internship is registered and approved.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Students - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <!-- Back Link & Header -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-custom rounded-pill px-3 py-1.5 fs-8 mb-2 d-inline-flex align-items-center">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                </a>
+                <h3 class="text-white fw-bold mb-0">Student Registry</h3>
+                <p class="text-muted fs-7 mb-0">List and manage student registrations, logins, and details.</p>
+            </div>
+            
+            <a href="{{ url_for('admin.add_student') }}" class="btn btn-primary-gradient rounded-pill px-4">
+                Add New Student <i class="bi bi-plus-circle ms-1"></i>
+            </a>
+        </div>
+
+        <!-- Search & Filter Card -->
+        <div class="card glass-card border border-secondary-soft p-4 mb-4">
+            <form method="GET" action="{{ url_for('admin.list_students') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label text-light fs-8 fw-semibold">Search</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark-soft border-secondary-soft text-muted"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white fs-7" id="search" name="search" placeholder="Name, Roll No, Course..." value="{{ search_query }}">
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <label for="course" class="form-label text-light fs-8 fw-semibold">Course</label>
+                    <select class="form-select bg-dark-soft border-secondary-soft text-white fs-7" id="course" name="course">
+                        <option value="">All Courses</option>
+                        {% for course in all_courses %}
+                            <option value="{{ course }}" {% if course_filter == course %}selected{% endif %}>{{ course }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="semester" class="form-label text-light fs-8 fw-semibold">Semester</label>
+                    <select class="form-select bg-dark-soft border-secondary-soft text-white fs-7" id="semester" name="semester">
+                        <option value="">All Semesters</option>
+                        {% for sem in [1, 2, 3, 4, 5, 6, 7, 8] %}
+                            <option value="{{ sem }}" {% if semester_filter == sem|string %}selected{% endif %}>Semester {{ sem }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="status" class="form-label text-light fs-8 fw-semibold">Login Status</label>
+                    <select class="form-select bg-dark-soft border-secondary-soft text-white fs-7" id="status" name="status">
+                        <option value="">All States</option>
+                        <option value="active" {% if status_filter == 'active' %}selected{% endif %}>Active Only</option>
+                        <option value="deactivated" {% if status_filter == 'deactivated' %}selected{% endif %}>Deactivated Only</option>
+                    </select>
+                </div>
+
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill py-2">Filter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Student Listing Table -->
+        <div class="card glass-card border border-secondary-soft p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark table-striped align-middle mb-0 text-start">
+                    <thead>
+                        <tr class="border-secondary-soft">
+                            <th class="ps-4">Student Name</th>
+                            <th>Roll Number</th>
+                            <th>Email</th>
+                            <th>Course</th>
+                            <th>Semester</th>
+                            <th>Login Status</th>
+                            <th class="pe-4 text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if students %}
+                            {% for std in students %}
+                                <tr class="border-secondary-soft">
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="brand-icon-wrapper me-2.5" style="width: 32px; height: 32px; min-width: 32px; background: rgba(59, 130, 246, 0.1) !important;">
+                                                <i class="bi bi-person brand-icon text-primary fs-7" style="line-height: 32px;"></i>
+                                            </div>
+                                            <span class="fw-bold text-white fs-7">{{ std.user.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge bg-dark-soft text-light border border-secondary-soft fs-8">{{ std.roll_no }}</span></td>
+                                    <td class="fs-7 text-muted">{{ std.user.email }}</td>
+                                    <td class="fs-7">{{ std.course }}</td>
+                                    <td>Semester {{ std.semester }}</td>
+                                    <td>
+                                        {% if std.user.is_active %}
+                                            <span class="badge bg-success-soft text-success rounded-pill px-2.5 py-1 fs-8">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-soft text-danger rounded-pill px-2.5 py-1 fs-8">Deactivated</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="pe-4 text-end">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <!-- Toggle status button -->
+                                            <form action="{{ url_for('admin.toggle_student_status', student_id=std.id) }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-sm rounded-pill px-3 py-1.5 fs-8 {% if std.user.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}">
+                                                    {% if std.user.is_active %}Deactivate{% else %}Activate{% endif %}
+                                                </button>
+                                            </form>
+
+                                            <a href="{{ url_for('admin.edit_student', student_id=std.id) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                Edit <i class="bi bi-pencil ms-1"></i>
+                                            </a>
+
+                                            <!-- Delete Form -->
+                                            <form action="{{ url_for('admin.delete_student', student_id=std.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this student and all their placement records? This action is irreversible.');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fs-8">
+                                                    Delete <i class="bi bi-trash ms-1"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5 text-muted">No students matching the filter requirements.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

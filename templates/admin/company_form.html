@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Company - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <!-- Back Link -->
+                <div class="mb-4 text-start">
+                    <a href="{{ url_for('admin.list_companies') }}" class="btn btn-outline-custom rounded-pill px-4 fs-7 py-2">
+                        <i class="bi bi-arrow-left me-2"></i> Back to Companies
+                    </a>
+                </div>
+
+                <div class="card glass-card border border-secondary-soft p-4 p-md-5">
+                    <div class="border-bottom border-secondary-soft pb-3 mb-4 text-start">
+                        <span class="badge bg-primary-soft text-primary-gradient mb-2 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                            Corporate Registry
+                        </span>
+                        <h3 class="text-white fw-bold mb-1">{{ action }} Company Partner</h3>
+                        <p class="text-muted fs-7 mb-0">Fill in the fields to configure the company record.</p>
+                    </div>
+
+                    <form method="POST" class="text-start">
+                        <!-- Company Name -->
+                        <div class="mb-3">
+                            <label for="company_name" class="form-label text-light fs-7 fw-semibold">Company Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="company_name" name="company_name" required value="{% if company %}{{ company.company_name }}{% endif %}">
+                        </div>
+
+                        <!-- Address -->
+                        <div class="mb-3">
+                            <label for="address" class="form-label text-light fs-7 fw-semibold">Corporate Address</label>
+                            <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="address" name="address" rows="3">{% if company and company.address %}{{ company.address }}{% endif %}</textarea>
+                        </div>
+
+                        <!-- Contact Person -->
+                        <div class="mb-3">
+                            <label for="contact_person" class="form-label text-light fs-7 fw-semibold">Contact Person / Coordinator</label>
+                            <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="contact_person" name="contact_person" value="{% if company and company.contact_person %}{{ company.contact_person }}{% endif %}">
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill mt-4 py-2.5 fw-bold">
+                            Save Company Partner <i class="bi bi-save ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

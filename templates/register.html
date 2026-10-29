@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}Register — InternTrack{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card-container-wide">
+        <div class="card auth-card p-4 p-md-5 text-center">
+            
+            <!-- InternTrack Badge Icon -->
+            <div class="auth-brand-badge mx-auto">
+                <i class="bi bi-person-plus-fill"></i>
+            </div>
+            
+            <!-- Header -->
+            <h2 class="text-white fw-bold mb-1 fs-3" id="reg-title">Create Account</h2>
+            <p class="text-muted fs-7 mb-4" id="reg-desc">Register as a student to log and track your academic internship timeline.</p>
+            
+            <!-- Role Toggle Switcher -->
+            <div class="role-pill-nav" role="tablist">
+                <button type="button" class="role-pill-btn active" id="btnRoleStudent" data-role="student">
+                    <i class="bi bi-mortarboard-fill"></i> Student Portal
+                </button>
+                <button type="button" class="role-pill-btn" id="btnRoleFaculty" data-role="faculty">
+                    <i class="bi bi-person-workspace"></i> Faculty Mentor
+                </button>
+            </div>
+
+            <!-- Registration Form -->
+            <form action="{{ url_for('auth.register') }}" method="POST" class="text-start" id="registerForm">
+                <!-- Hidden Role Field -->
+                <input type="hidden" name="role" id="roleInput" value="{{ form_data.get('role', 'student') if form_data else 'student' }}">
+
+                <div class="row g-3">
+                    <!-- Full Name -->
+                    <div class="col-md-6">
+                        <label for="name" class="auth-form-label">Full Name</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" class="form-control" id="name" name="name" 
+                                   value="{{ form_data.get('name', '') if form_data else '' }}" 
+                                   placeholder="e.g. John Doe" required autocomplete="name">
+                        </div>
+                    </div>
+                    
+                    <!-- Email Address -->
+                    <div class="col-md-6">
+                        <label for="email" class="auth-form-label">Email Address</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" 
+                                   value="{{ form_data.get('email', '') if form_data else '' }}" 
+                                   placeholder="name@university.edu" required autocomplete="email">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Specific Fields -->
+                <div class="row g-3 mt-1" id="student-fields">
+                    <!-- Roll Number -->
+                    <div class="col-md-6">
+                        <label for="roll_no" class="auth-form-label">Roll Number / Student ID</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                            <input type="text" class="form-control" id="roll_no" name="roll_no" 
+                                   value="{{ form_data.get('roll_no', '') if form_data else '' }}" 
+                                   placeholder="e.g. CS202604" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Course / Degree -->
+                    <div class="col-md-6">
+                        <label for="course" class="auth-form-label">Course / Degree Program</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-book"></i></span>
+                            <input type="text" class="form-control" id="course" name="course" 
+                                   value="{{ form_data.get('course', '') if form_data else '' }}" 
+                                   placeholder="e.g. B.Tech Computer Science" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Semester -->
+                    <div class="col-md-6">
+                        <label for="semester" class="auth-form-label">Current Semester</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-123"></i></span>
+                            <input type="number" class="form-control" id="semester" name="semester" 
+                                   value="{{ form_data.get('semester', '') if form_data else '' }}" 
+                                   placeholder="e.g. 5" min="1" max="10" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone Number -->
+                    <div class="col-md-6">
+                        <label for="phone" class="auth-form-label">Phone Number <span class="text-muted fw-normal">(Optional)</span></label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input type="tel" class="form-control" id="phone" name="phone" 
+                                   value="{{ form_data.get('phone', '') if form_data else '' }}" 
+                                   placeholder="e.g. +1 555-019-2834" autocomplete="tel">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faculty Specific Fields (Hidden by default) -->
+                <div class="row g-3 mt-1 d-none" id="faculty-fields">
+                    <!-- Employee ID -->
+                    <div class="col-md-6">
+                        <label for="employee_id" class="auth-form-label">Faculty / Employee ID</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <input type="text" class="form-control" id="employee_id" name="employee_id" 
+                                   value="{{ form_data.get('employee_id', '') if form_data else '' }}" 
+                                   placeholder="e.g. FAC-CS-101">
+                        </div>
+                    </div>
+                    
+                    <!-- Department -->
+                    <div class="col-md-6">
+                        <label for="department" class="auth-form-label">Academic Department</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            <input type="text" class="form-control" id="department" name="department" 
+                                   value="{{ form_data.get('department', '') if form_data else '' }}" 
+                                   placeholder="e.g. Computer Science & Engineering">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Row -->
+                <div class="row g-3 mt-1">
+                    <!-- Password -->
+                    <div class="col-md-6">
+                        <label for="password" class="auth-form-label">Password</label>
+                        <div class="input-group auth-input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" 
+                                   placeholder="Enter strong password" required autocomplete="new-password">
+                            <button class="btn btn-password-toggle" type="button" aria-label="Toggle password visibility">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm Password -->
+                    <div class="col-md-6">
+                        <label for="confirm_password" class="auth-form-label">Confirm Password</label>
+                        <div class="input-group auth-input-group" id="confirmPwdGroup">
+                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
+                                   placeholder="Re-enter password" required autocomplete="new-password">
+                            <button class="btn btn-password-toggle" type="button" aria-label="Toggle confirm password visibility">
+                                <i class="bi bi-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Match Helper Notice -->
+                <div class="mt-2 text-end d-none" id="pwdMatchNotice">
+                    <span class="fs-8" id="pwdMatchText"></span>
+                </div>
+                
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-auth-submit mt-4 mb-3" id="registerSubmitBtn">
+                    Create Account <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </form>
+            
+            <!-- Subtle Divider -->
+            <hr class="border-secondary-soft my-3.5">
+            
+            <!-- Bottom Link -->
+            <p class="text-muted fs-8 mb-0">
+                Already registered? <a href="{{ url_for('auth.login') }}" class="text-info fw-semibold text-decoration-none hover-white ms-1">Sign in to your account</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleInput = document.getElementById('roleInput');
+    const btnStudent = document.getElementById('btnRoleStudent');
+    const btnFaculty = document.getElementById('btnRoleFaculty');
+    const studentFields = document.getElementById('student-fields');
+    const facultyFields = document.getElementById('faculty-fields');
+    const regTitle = document.getElementById('reg-title');
+    const regDesc = document.getElementById('reg-desc');
+    
+    const studentInputs = studentFields.querySelectorAll('input:not(#phone)');
+    const facultyInputs = facultyFields.querySelectorAll('input');
+    
+    function setRole(role) {
+        roleInput.value = role;
+        if (role === 'faculty') {
+            btnFaculty.classList.add('active');
+            btnStudent.classList.remove('active');
+            
+            studentFields.classList.add('d-none');
+            facultyFields.classList.remove('d-none');
+            
+            regTitle.textContent = "Faculty Registration";
+            regDesc.textContent = "Register as a faculty mentor or coordinator to manage and evaluate student internships.";
+            
+            studentInputs.forEach(input => input.removeAttribute('required'));
+            facultyInputs.forEach(input => input.setAttribute('required', 'required'));
+        } else {
+            btnStudent.classList.add('active');
+            btnFaculty.classList.remove('active');
+            
+            facultyFields.classList.add('d-none');
+            studentFields.classList.remove('d-none');
+            
+            regTitle.textContent = "Create Account";
+            regDesc.textContent = "Register as a student to log and track your academic internship timeline.";
+            
+            facultyInputs.forEach(input => input.removeAttribute('required'));
+            studentInputs.forEach(input => input.setAttribute('required', 'required'));
+        }
+    }
+    
+    btnStudent.addEventListener('click', () => setRole('student'));
+    btnFaculty.addEventListener('click', () => setRole('faculty'));
+    
+    // Initial sync with value if form had errors
+    const initialRole = roleInput.value || 'student';
+    setRole(initialRole);
+    
+    // Real-time password match feedback
+    const pwdInput = document.getElementById('password');
+    const confirmPwdInput = document.getElementById('confirm_password');
+    const notice = document.getElementById('pwdMatchNotice');
+    const noticeText = document.getElementById('pwdMatchText');
+    
+    function checkPasswords() {
+        if (!confirmPwdInput.value) {
+            notice.classList.add('d-none');
+            return;
+        }
+        notice.classList.remove('d-none');
+        if (pwdInput.value === confirmPwdInput.value) {
+            noticeText.innerHTML = '<span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Passwords match</span>';
+        } else {
+            noticeText.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i> Passwords do not match</span>';
+        }
+    }
+    
+    pwdInput.addEventListener('input', checkPasswords);
+    confirmPwdInput.addEventListener('input', checkPasswords);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- User Profile Card -->
+                <div class="card glass-card border border-secondary-soft p-4 p-md-5 mb-4 shadow-lg">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-secondary-soft">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="position-relative">
+                                <img src="{{ url_for('auth.get_user_image', user_id=user.id) }}" 
+                                     alt="{{ user.name }}" 
+                                     class="rounded-circle border border-2 border-primary shadow-sm" 
+                                     style="width: 64px; height: 64px; min-width: 64px; object-fit: cover;">
+                            </div>
+                            <div>
+                                <h3 class="text-white fw-bold mb-0">{{ user.name }}</h3>
+                                <span class="text-muted fs-7">{{ user.email }}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge {% if user.role == 'admin' %}bg-primary-soft text-primary{% elif user.role == 'faculty' %}bg-warning-soft text-warning{% else %}bg-success-soft text-success{% endif %} py-1.5 px-3 rounded-pill fs-7 text-uppercase fw-semibold border border-secondary-soft">
+                                <i class="bi {% if user.role == 'admin' %}bi-shield-check{% elif user.role == 'faculty' %}bi-person-badge{% else %}bi-mortarboard{% endif %} me-1"></i>
+                                {{ user.role }} Account
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Profile Information Grid -->
+                    <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle text-primary"></i> Account Credentials & Metadata
+                    </h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Full Name</span>
+                                <span class="text-white fw-bold">{{ user.name }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Email Address</span>
+                                <span class="text-white fw-bold">{{ user.email }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Account Status</span>
+                                <span class="badge bg-success-soft text-success rounded-pill px-2.5 py-1">Active</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Member Since</span>
+                                <span class="text-white fw-bold">{{ user.created_at.strftime('%B %d, %Y') if user.created_at else 'Active' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Role-Specific Details -->
+                    {% if user.role == 'student' and student %}
+                        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-mortarboard text-primary"></i> Academic Enrollment Record
+                        </h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Roll Number</span>
+                                    <span class="text-white fw-bold">{{ student.roll_no }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Academic Course</span>
+                                    <span class="text-white fw-bold">{{ student.course }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Current Semester</span>
+                                    <span class="text-white fw-bold">Semester {{ student.semester }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Contact Phone</span>
+                                    <span class="text-white fw-bold">{{ student.phone or 'Not Provided' }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Internship Registration</span>
+                                    <span class="text-white fw-bold">
+                                        {% if internship %}
+                                            {{ internship.role }} at {{ internship.company.company_name if internship.company else 'Self Placed' }}
+                                        {% else %}
+                                            <span class="text-muted">Not Registered</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% elif user.role == 'faculty' and faculty %}
+                        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-person-badge text-warning"></i> Faculty Advisor Credentials
+                        </h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Employee ID</span>
+                                    <span class="text-white fw-bold">{{ faculty.employee_id }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3">
+                                    <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Academic Department</span>
+                                    <span class="text-white fw-bold">{{ faculty.department }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% elif user.role == 'admin' %}
+                        <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check text-primary"></i> Administrative Authority
+                        </h5>
+                        <div class="card bg-dark-soft border border-secondary-soft p-3 rounded-3 mb-4">
+                            <p class="text-muted fs-7 mb-0">
+                                <i class="bi bi-check-circle-fill text-success me-2"></i>Full System Privileges: Student Management, Placement Approvals, Corporate Partners, Analytics, and Institutional Reports Export.
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <!-- Database Image Storage Section (BLOB) -->
+                    <div class="card bg-dark-soft border border-primary-soft p-4 rounded-3 mb-4 shadow-sm">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                            <h5 class="text-white fw-bold mb-0 d-flex align-items-center gap-2">
+                                <i class="bi bi-image text-primary"></i> Profile Photo (Database BLOB Storage)
+                            </h5>
+                            <span class="badge bg-primary-soft text-primary border border-secondary-soft py-1 px-2.5 rounded-pill fs-8">
+                                <i class="bi bi-database me-1"></i> Stored in SQLite (LargeBinary)
+                            </span>
+                        </div>
+                        <p class="text-muted fs-8 mb-3">
+                            This image is saved directly into the SQLite database as binary data (BLOB) via SQLAlchemy ORM, demonstrating database binary storage.
+                        </p>
+                        
+                        <div class="row align-items-center g-3">
+                            <div class="col-auto">
+                                <img src="{{ url_for('auth.get_user_image', user_id=user.id) }}" 
+                                     alt="Current Avatar" 
+                                     class="rounded-circle border border-2 border-primary object-fit-cover shadow" 
+                                     style="width: 80px; height: 80px; min-width: 80px; object-fit: cover;">
+                            </div>
+                            <div class="col">
+                                <form action="{{ url_for('auth.upload_profile_image') }}" method="POST" enctype="multipart/form-data" class="d-flex flex-wrap align-items-center gap-2">
+                                    <div class="flex-grow-1" style="min-width: 220px;">
+                                        <input type="file" name="profile_image" accept="image/png, image/jpeg, image/webp" class="form-control form-control-sm bg-dark border-secondary-soft text-light rounded-pill px-3" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary-gradient rounded-pill px-3">
+                                        <i class="bi bi-upload me-1"></i> Save to DB
+                                    </button>
+                                </form>
+                                {% if user.profile_image %}
+                                    <form action="{{ url_for('auth.delete_profile_image') }}" method="POST" class="mt-2">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 py-1 fs-9">
+                                            <i class="bi bi-trash3 me-1"></i> Remove from DB
+                                        </button>
+                                        <span class="text-muted fs-9 ms-2">Stored filename: {{ user.profile_image.filename }}</span>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Return Button -->
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top border-secondary-soft">
+                        {% if user.role == 'student' %}
+                            <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary-gradient rounded-pill px-4">
+                                <i class="bi bi-speedometer2 me-1"></i> Return to Dashboard
+                            </a>
+                        {% elif user.role == 'faculty' %}
+                            <a href="{{ url_for('faculty.dashboard') }}" class="btn btn-primary-gradient rounded-pill px-4">
+                                <i class="bi bi-speedometer2 me-1"></i> Return to Dashboard
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary-gradient rounded-pill px-4">
+                                <i class="bi bi-speedometer2 me-1"></i> Return to Dashboard
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

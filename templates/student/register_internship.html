@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Internship - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card glass-card border border-secondary-soft p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 border-bottom border-secondary-soft pb-3">
+                        <div class="brand-icon-wrapper">
+                            <i class="bi bi-briefcase-fill brand-icon"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-white fw-bold mb-0">Register Your Internship</h2>
+                            <p class="text-muted fs-7 mb-0">Fill in your placement details for coordinator verification and approvals.</p>
+                        </div>
+                    </div>
+                    
+                    <form action="{{ url_for('student.register_internship') }}" method="POST">
+                        <!-- Section 1: Employer Details -->
+                        <h5 class="text-primary-gradient fw-bold mb-3"><i class="bi bi-building me-2"></i>1. Employer / Organization Info</h5>
+                        <div class="row g-3 mb-4">
+                            <!-- Company Name -->
+                            <div class="col-md-6">
+                                <label for="company" class="form-label text-light fs-7 fw-semibold">Company Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="company" name="company" placeholder="e.g. Google LLC" required>
+                            </div>
+                            
+                            <!-- Company Contact Person -->
+                            <div class="col-md-6">
+                                <label for="company_contact" class="form-label text-light fs-7 fw-semibold">Company Contact Person</label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="company_contact" name="company_contact" placeholder="e.g. HR Manager">
+                            </div>
+                            
+                            <!-- Company Address -->
+                            <div class="col-12">
+                                <label for="company_address" class="form-label text-light fs-7 fw-semibold">Company Address</label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="company_address" name="company_address" placeholder="e.g. 1600 Amphitheatre Pkwy, Mountain View, CA">
+                            </div>
+                        </div>
+                        
+                        <!-- Section 2: Internship Profile -->
+                        <h5 class="text-primary-gradient fw-bold mb-3"><i class="bi bi-file-earmark-person me-2"></i>2. Placement Profile</h5>
+                        <div class="row g-3 mb-4">
+                            <!-- Role Title -->
+                            <div class="col-md-6">
+                                <label for="role" class="form-label text-light fs-7 fw-semibold">Internship Role / Title <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="role" name="role" placeholder="e.g. Software Engineer Intern" required>
+                            </div>
+                            
+                            <!-- Internship Format -->
+                            <div class="col-md-6">
+                                <label for="internship_type" class="form-label text-light fs-7 fw-semibold">Internship Format <span class="text-danger">*</span></label>
+                                <select class="form-select bg-dark-soft border-secondary-soft text-white" id="internship_type" name="internship_type" required>
+                                    <option value="" disabled selected>Select location format</option>
+                                    <option value="offline">Offline / On-site</option>
+                                    <option value="online">Online / Remote</option>
+                                    <option value="hybrid">Hybrid</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Start Date -->
+                            <div class="col-md-6">
+                                <label for="start_date" class="form-label text-light fs-7 fw-semibold">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control bg-dark-soft border-secondary-soft text-white" id="start_date" name="start_date" required>
+                            </div>
+                            
+                            <!-- End Date -->
+                            <div class="col-md-6">
+                                <label for="end_date" class="form-label text-light fs-7 fw-semibold">End Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control bg-dark-soft border-secondary-soft text-white" id="end_date" name="end_date" required>
+                            </div>
+                            
+                            <!-- Job Description -->
+                            <div class="col-12">
+                                <label for="description" class="form-label text-light fs-7 fw-semibold">Job Description</label>
+                                <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="description" name="description" rows="3" placeholder="Briefly describe your internship duties, project domains, and learning outcomes..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Section 3: Supervisor Details -->
+                        <h5 class="text-primary-gradient fw-bold mb-3"><i class="bi bi-person-badge me-2"></i>3. Supervisor Details</h5>
+                        <div class="row g-3 mb-4">
+                            <!-- Supervisor Name -->
+                            <div class="col-md-4">
+                                <label for="supervisor_name" class="form-label text-light fs-7 fw-semibold">Supervisor Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="supervisor_name" name="supervisor_name" placeholder="Dr. Sarah Jenkins" required>
+                            </div>
+                            
+                            <!-- Supervisor Email -->
+                            <div class="col-md-4">
+                                <label for="supervisor_email" class="form-label text-light fs-7 fw-semibold">Supervisor Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control bg-dark-soft border-secondary-soft text-white" id="supervisor_email" name="supervisor_email" placeholder="sarah.jenkins@company.com" required>
+                            </div>
+                            
+                            <!-- Supervisor Phone -->
+                            <div class="col-md-4">
+                                <label for="supervisor_phone" class="form-label text-light fs-7 fw-semibold">Supervisor Phone</label>
+                                <input type="tel" class="form-control bg-dark-soft border-secondary-soft text-white" id="supervisor_phone" name="supervisor_phone" placeholder="+1 (555) 019-2834">
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Block -->
+                        <div class="d-flex gap-3 justify-content-end mt-4">
+                            <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-custom rounded-pill px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary-gradient rounded-pill px-4">
+                                Submit Registration <i class="bi bi-send ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

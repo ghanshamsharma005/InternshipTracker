@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}InternTrack - Internship Management & Analytics System{% endblock %}</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="InternTrack is a state-of-the-art internship management and analytics platform connecting students, faculty, and administrators.">
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.0.4">
+
+
+
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Glassmorphic Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-glass" id="mainNavbar">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <div class="brand-icon-wrapper me-2">
+                    <i class="bi bi-shield-check brand-icon"></i>
+                </div>
+                <span class="brand-text">Intern<span class="text-primary-gradient">Track</span></span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+                    {% if session.get('user_id') %}
+                        {% if session.get('role') == 'student' %}
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('student.dashboard') }}">Student Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('student.view_timeline') }}">Timeline</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('student.manage_progress') }}">Progress Log</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('student.manage_documents') }}">Documents</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('student.view_deadlines') }}">Deadlines</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('student.view_evaluation') }}">Evaluation</a>
+                            </li>
+
+                        {% elif session.get('role') == 'faculty' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('faculty.dashboard') }}">Faculty Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('faculty.list_students') }}">Students List</a>
+                            </li>
+                        {% elif session.get('role') == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.list_students') }}">Students</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.list_internships') }}">Internships</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.list_companies') }}">Companies</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('admin.reports') }}">Reports & Export</a>
+                            </li>
+                        {% endif %}
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}#features">Features</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}#lifecycle">Lifecycle</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}#benefits">Portals</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}#analytics">Analytics</a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    {% if session.get('user_id') %}
+                        {% if session.get('role') == 'student' %}
+                            <!-- Notifications Dropdown -->
+                            <div class="dropdown me-2">
+                                <button class="btn btn-link position-relative text-light p-0 border-0 nav-link" type="button" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications">
+                                    <i class="bi bi-bell fs-5"></i>
+                                    {% if unread_notifications_count > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-dark" style="font-size: 0.6rem; padding: 0.25em 0.4em;">
+                                            {{ unread_notifications_count }}
+                                        </span>
+                                    {% endif %}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end bg-dark-soft border border-secondary-soft p-2 mt-2 shadow-lg" aria-labelledby="notifDropdown" style="min-width: 280px; max-width: 320px; max-height: 400px; overflow-y: auto;">
+                                    <div class="d-flex justify-content-between align-items-center px-2 py-1 border-bottom border-secondary-soft mb-2">
+                                        <span class="text-white fw-bold fs-8">Notifications</span>
+                                        {% if unread_notifications_count > 0 %}
+                                            <form action="{{ url_for('student.read_all_notifications') }}" method="POST" class="m-0">
+                                                <button type="submit" class="btn btn-link p-0 text-primary-gradient text-decoration-none fs-9">Mark all as read</button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                    {% if global_notifications %}
+                                        {% for notif in global_notifications %}
+                                            <li class="p-2 rounded {% if not notif.is_read %}bg-dark-deep border-start border-3 border-primary{% else %}opacity-75{% endif %} mb-1 position-relative" style="list-style: none;">
+                                                <div class="d-flex justify-content-between gap-2">
+                                                    <span class="text-light fw-semibold fs-8 d-block">{{ notif.title }}</span>
+                                                    {% if not notif.is_read %}
+                                                        <form action="{{ url_for('student.read_notification', notification_id=notif.id) }}" method="POST" class="m-0">
+                                                            <button type="submit" class="btn btn-link p-0 text-muted hover-white fs-8" title="Mark as read">
+                                                                <i class="bi bi-check-lg"></i>
+                                                            </button>
+                                                        </form>
+                                                    {% endif %}
+                                                </div>
+                                                <p class="text-muted fs-8 mb-0 mt-1 leading-normal" style="white-space: normal; word-wrap: break-word;">{{ notif.message }}</p>
+                                            </li>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="text-center text-muted fs-8 py-3">No notifications.</div>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        <a href="{{ url_for('auth.profile') }}" class="text-decoration-none text-muted fs-7 me-2 hover-white d-flex align-items-center gap-2" title="View Profile">
+                            <img src="{{ url_for('auth.get_user_image', user_id=session.get('user_id')) }}" alt="Avatar" class="rounded-circle border border-primary object-fit-cover shadow-sm" style="width: 28px; height: 28px; min-width: 28px; object-fit: cover;">
+                            <span>Hi, {{ session.get('user_name') }}</span>
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-custom px-4 rounded-pill fs-7 py-2" id="logoutBtn">Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-link nav-link-login p-0 me-2" id="loginBtn">Sign In</a>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary-gradient px-4 rounded-pill fs-7 py-2 shadow-sm" id="getStartedBtn">Get Started</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content-wrapper">
+        <div class="container mt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show shadow-sm d-flex align-items-center justify-content-between" role="alert">
+                            <div class="d-flex align-items-center gap-2">
+                                {% if category == 'success' %}
+                                    <i class="bi bi-check-circle-fill fs-5"></i>
+                                {% elif category == 'danger' or category == 'error' %}
+                                    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                                {% else %}
+                                    <i class="bi bi-info-circle-fill fs-5"></i>
+                                {% endif %}
+                                <span>{{ message }}</span>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Professional Clean Footer -->
+    <footer class="footer-custom py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4 justify-content-between">
+                <div class="col-lg-5 col-md-12">
+                    <div class="footer-brand d-flex align-items-center mb-3">
+                        <div class="brand-icon-wrapper me-2">
+                            <i class="bi bi-shield-check brand-icon"></i>
+                        </div>
+                        <span class="brand-text text-white">Intern<span class="text-primary-gradient">Track</span></span>
+                    </div>
+                    <p class="text-muted footer-desc mb-3" style="max-width: 440px;">
+                        Enterprise-grade academic internship management and analytics platform connecting students, faculty mentors, and placement administrators into one unified workflow.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-dark-soft text-muted border border-secondary-soft py-1.5 px-3 rounded-pill fs-9">
+                            <i class="bi bi-cpu me-1 text-primary"></i> Python & Flask 3.0
+                        </span>
+                        <span class="badge bg-dark-soft text-muted border border-secondary-soft py-1.5 px-3 rounded-pill fs-9">
+                            <i class="bi bi-database me-1 text-info"></i> SQLite & SQLAlchemy
+                        </span>
+                        <span class="badge bg-dark-soft text-muted border border-secondary-soft py-1.5 px-3 rounded-pill fs-9">
+                            <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> ReportLab Engine
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 col-6">
+                    <h6 class="text-white fw-bold mb-3 fs-7 text-uppercase tracking-wider">Navigation</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{{ url_for('main.index') }}#features"><i class="bi bi-chevron-right me-1 fs-9 text-primary"></i> Core Features</a></li>
+                        <li><a href="{{ url_for('main.index') }}#lifecycle"><i class="bi bi-chevron-right me-1 fs-9 text-primary"></i> 6-Step Lifecycle</a></li>
+                        <li><a href="{{ url_for('main.index') }}#benefits"><i class="bi bi-chevron-right me-1 fs-9 text-primary"></i> Role Portals</a></li>
+                        <li><a href="{{ url_for('main.index') }}#analytics"><i class="bi bi-chevron-right me-1 fs-9 text-primary"></i> Analytics & Reports</a></li>
+                    </ul>
+                </div>
+
+                <div class="col-lg-3 col-md-6 col-6">
+                    <h6 class="text-white fw-bold mb-3 fs-7 text-uppercase tracking-wider">Access Portals</h6>
+                    <ul class="list-unstyled footer-links">
+                        <li><a href="{{ url_for('auth.login') }}"><i class="bi bi-box-arrow-in-right me-1 fs-9 text-info"></i> Account Sign In</a></li>
+                        <li><a href="{{ url_for('auth.register') }}"><i class="bi bi-person-plus me-1 fs-9 text-info"></i> Student / Faculty Register</a></li>
+                        <li><a href="{{ url_for('main.index') }}#benefits"><i class="bi bi-mortarboard me-1 fs-9 text-info"></i> Student Workspace</a></li>
+                        <li><a href="{{ url_for('main.index') }}#benefits"><i class="bi bi-shield-lock me-1 fs-9 text-info"></i> Admin Console</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="footer-divider my-4 border-secondary-soft">
+            
+            <div class="row align-items-center justify-content-between g-2">
+                <div class="col-md-7 text-center text-md-start">
+                    <p class="mb-0 text-muted fs-8">&copy; 2026 InternTrack — Internship Management & Analytics Platform. Academic Minor Project.</p>
+                </div>
+                <div class="col-md-5 text-center text-md-end">
+                    <span class="text-muted fs-8"><i class="bi bi-shield-check text-success me-1"></i> RBAC Security • CSRF & Path-Traversal Protected</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom Global JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

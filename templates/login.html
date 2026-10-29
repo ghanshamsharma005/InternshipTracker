@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In — InternTrack{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card-container">
+        <div class="card auth-card p-4 p-sm-5 text-center">
+            
+            <!-- InternTrack Shield Icon -->
+            <div class="auth-brand-badge mx-auto">
+                <i class="bi bi-shield-check"></i>
+            </div>
+            
+            <!-- Header -->
+            <h2 class="text-white fw-bold mb-1 fs-3">Welcome Back</h2>
+            <p class="text-muted fs-7 mb-4">Sign in to continue to your portal.</p>
+            
+            <!-- Login Form -->
+            <form action="{{ url_for('auth.login') }}" method="POST" class="text-start">
+                
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="email" class="auth-form-label">Email Address</label>
+                    <div class="input-group auth-input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ email if email else '' }}" placeholder="name@interntrack.edu" required autocomplete="email">
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="mb-4">
+                    <label for="password" class="auth-form-label">Password</label>
+                    <div class="input-group auth-input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <button class="btn btn-password-toggle" type="button" id="togglePassword" aria-label="Toggle password visibility">
+                            <i class="bi bi-eye-slash" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Sign In Button -->
+                <button type="submit" class="btn btn-auth-submit mb-3" id="loginSubmitBtn">
+                    Sign In <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+            </form>
+            
+            <!-- Subtle Divider -->
+            <hr class="border-secondary-soft my-3.5">
+            
+            <!-- Bottom Registration Link -->
+            <p class="text-muted fs-8 mb-0">
+                New student? <a href="{{ url_for('auth.register') }}" class="text-info fw-semibold text-decoration-none hover-white ms-1">Create an account</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

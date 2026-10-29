@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Weekly Progress - InternTrack{% endblock %}
+
+{% block content %}
+<section class="py-6 position-relative overflow-hidden min-vh-80 d-flex align-items-center">
+    <div class="hero-blur-orb orb-1"></div>
+    <div class="hero-blur-orb orb-2"></div>
+    
+    <div class="container position-relative z-2">
+        <div class="row g-4">
+            <!-- Left column: Submit Report Form -->
+            <div class="col-lg-6 col-md-12">
+                <div class="card glass-card border border-secondary-soft p-4 p-md-5">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="brand-icon-wrapper me-3">
+                            <i class="bi bi-journal-plus brand-icon text-white"></i>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary-soft text-primary-gradient mb-1 py-1 px-3 rounded-pill border border-primary-soft fw-semibold fs-8">
+                                Weekly Progress Log
+                            </span>
+                            <h3 class="text-white fw-bold mb-0">Submit Weekly Report</h3>
+                        </div>
+                    </div>
+                    
+                    <form action="{{ url_for('student.manage_progress') }}" method="POST" enctype="multipart/form-data" class="text-start">
+                        <!-- Week Number & Hours Worked Row -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="week_number" class="form-label text-light fs-7 fw-semibold">Week Number <span class="text-danger">*</span></label>
+                                <input type="number" min="1" class="form-control bg-dark-soft border-secondary-soft text-white" id="week_number" name="week_number" placeholder="e.g. 1" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="hours_worked" class="form-label text-light fs-7 fw-semibold">Hours Worked <span class="text-danger">*</span></label>
+                                <input type="number" step="0.5" min="0" class="form-control bg-dark-soft border-secondary-soft text-white" id="hours_worked" name="hours_worked" placeholder="e.g. 35.5" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Tasks Completed -->
+                        <div class="mb-3">
+                            <label for="tasks_completed" class="form-label text-light fs-7 fw-semibold">Tasks Completed <span class="text-danger">*</span></label>
+                            <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="tasks_completed" name="tasks_completed" rows="4" placeholder="Describe the tasks and work you completed this week..." required></textarea>
+                        </div>
+                        
+                        <!-- Skills Learned -->
+                        <div class="mb-3">
+                            <label for="skills_learned" class="form-label text-light fs-7 fw-semibold">Skills Learned</label>
+                            <input type="text" class="form-control bg-dark-soft border-secondary-soft text-white" id="skills_learned" name="skills_learned" placeholder="e.g. SQLite, Backend APIs, Git branches">
+                        </div>
+                        
+                        <!-- Challenges faced -->
+                        <div class="mb-3">
+                            <label for="challenges" class="form-label text-light fs-7 fw-semibold">Challenges Faced</label>
+                            <textarea class="form-control bg-dark-soft border-secondary-soft text-white" id="challenges" name="challenges" rows="2" placeholder="Detail any roadblocks or issues encountered..."></textarea>
+                        </div>
+                        
+                        <!-- Upload Report file -->
+                        <div class="mb-4">
+                            <label for="report_file" class="form-label text-light fs-7 fw-semibold">Upload Report Document</label>
+                            <input type="file" class="form-control bg-dark-soft border-secondary-soft text-white" id="report_file" name="report_file">
+                            <small class="text-muted fs-8 mt-1 d-block">Supported file formats: PDF, DOCX, ZIP, PNG, JPG (Max 16MB)</small>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary-gradient w-100 rounded-pill mb-2">
+                            Submit Weekly Log <i class="bi bi-send ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Right column: Dynamic Progress & History -->
+            <div class="col-lg-6 col-md-12">
+                <!-- Progress bar card -->
+                <div class="card glass-card border border-secondary-soft p-4 mb-4">
+                    <div class="d-flex justify-content-between text-muted fs-8 mb-2">
+                        <span class="fw-bold">Overall Internship Progress</span>
+                        <span class="fw-bold text-white">{{ progress_percent }}%</span>
+                    </div>
+                    <div class="progress bg-dark-deep" style="height: 10px;">
+                        <div class="progress-bar bg-primary-gradient progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ progress_percent }}%" aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                
+                <!-- Progress History card -->
+                <div class="card glass-card border border-secondary-soft p-4">
+                    <h4 class="text-white fw-bold mb-3"><i class="bi bi-clock-history text-primary-gradient me-2"></i>Weekly Submission History</h4>
+                    <p class="text-muted fs-7 mb-4">Monitor previous reports, review feedback, or edit pending logs.</p>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        {% if weekly_stages %}
+                            {% for stage in weekly_stages %}
+                                <div class="p-3 rounded border border-secondary-soft bg-dark-soft">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-white fw-bold fs-7">{{ stage.title }}</span>
+                                        
+                                        <!-- Status tags -->
+                                        {% if stage.status == 'Completed' %}
+                                            <span class="badge bg-success-soft text-success rounded-pill px-2.5 py-1 fs-8">Completed</span>
+                                        {% elif stage.status == 'Submitted' %}
+                                            <span class="badge bg-primary-soft text-primary-gradient rounded-pill border border-primary-soft px-2.5 py-1 fs-8">Submitted</span>
+                                        {% elif stage.status == 'In Progress' %}
+                                            <span class="badge bg-info-soft text-info rounded-pill px-2.5 py-1 fs-8">In Progress</span>
+                                        {% elif stage.status == 'Overdue' %}
+                                            <span class="badge bg-danger-soft text-danger rounded-pill px-2.5 py-1 fs-8">Overdue</span>
+                                        {% else %}
+                                            <span class="badge bg-dark-soft text-muted rounded-pill px-2.5 py-1 fs-8">Pending</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    {% if stage.report %}
+                                        <!-- If report exists, show summary -->
+                                        <p class="text-muted fs-8 mb-2">
+                                            <strong>Tasks:</strong> {{ stage.report.tasks_completed | truncate(80) }}
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center mt-2 border-top border-secondary-soft pt-2 fs-8 text-muted">
+                                            <span>Hours Logged: <strong class="text-white">{{ stage.report.hours_worked }}h</strong></span>
+                                            
+                                            <div class="d-flex gap-2">
+                                                {% if stage.report.report_file %}
+                                                    <a href="/uploads/{{ stage.report.report_file }}" target="_blank" class="text-primary-gradient text-decoration-none">
+                                                        <i class="bi bi-file-earmark-arrow-down me-1"></i> File
+                                                    </a>
+                                                {% endif %}
+                                                
+                                                {% if stage.report.status != 'approved' %}
+                                                    <a href="{{ url_for('student.edit_progress', report_id=stage.report.id) }}" class="text-warning text-decoration-none">
+                                                        <i class="bi bi-pencil-square me-1"></i> Edit
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <!-- No report yet -->
+                                        <p class="text-muted fs-8 mb-0">No report submitted for this stage.</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-4 mb-0">Timeline must be approved to start logging progress.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

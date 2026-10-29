@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "wholroyd.jinja",
+        "samuelcolvin.jinjahtml",
+        "qwt.sqlite-viewer"
+    ]
+}

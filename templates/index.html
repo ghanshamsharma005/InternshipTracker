@@ -1,0 +1,612 @@
+{% extends 'base.html' %}
+
+{% block title %}InternTrack — Internship Management & Analytics Platform{% endblock %}
+
+{% block content %}
+<!-- =========================================================================
+     HERO SECTION: Balanced Two-Column SaaS Architecture
+     ========================================================================= -->
+<section class="hero-section position-relative d-flex align-items-center">
+    <div class="container position-relative z-2">
+        <div class="row align-items-center g-5">
+            
+            <!-- Left Column: Value Proposition & CTAs -->
+            <div class="col-lg-6 text-start">
+                <div class="mb-3">
+                    <span class="hero-eyebrow-pill">
+                        <i class="bi bi-shield-check text-primary"></i>
+                        <span>INTERNSHIP MANAGEMENT PLATFORM</span>
+                    </span>
+                </div>
+
+                <h1 class="hero-title">
+                    Your Entire Internship Journey. <span class="text-gradient-accent">One Platform.</span>
+                </h1>
+
+                <p class="hero-subtitle">
+                    InternTrack unifies student registrations, milestone timelines, weekly progress logs, document compliance, deadline countdowns, faculty evaluations, and placement analytics into a single institutional workflow.
+                </p>
+
+                <!-- Primary & Secondary CTA Buttons -->
+                <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+                    {% if session.get('user_id') %}
+                        {% if session.get('role') == 'student' %}
+                            <a href="{{ url_for('student.dashboard') }}" class="btn btn-primary-cta">
+                                Open Dashboard <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        {% elif session.get('role') == 'faculty' %}
+                            <a href="{{ url_for('faculty.dashboard') }}" class="btn btn-primary-cta">
+                                Faculty Dashboard <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary-cta">
+                                Admin Console <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary-cta" id="heroGetStartedBtn">
+                            Get Started <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    {% endif %}
+                    <a href="#features" class="btn btn-secondary-cta" id="heroExploreFeaturesBtn">
+                        Explore Features <i class="bi bi-chevron-down ms-1"></i>
+                    </a>
+                </div>
+
+                <!-- Trust / Value Statement -->
+                <div class="hero-trust-bullets">
+                    <span class="d-inline-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-primary me-2"></i> Track progress
+                    </span>
+                    <span class="text-secondary d-none d-sm-inline">•</span>
+                    <span class="d-inline-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-info me-2"></i> Meet deadlines
+                    </span>
+                    <span class="text-secondary d-none d-sm-inline">•</span>
+                    <span class="d-inline-flex align-items-center">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i> Stay organized
+                    </span>
+                </div>
+            </div>
+
+            <!-- Right Column: Realistic Product Preview Panel -->
+            <div class="col-lg-6">
+                <div class="preview-browser-frame">
+                    <!-- Browser Window Header -->
+                    <div class="preview-browser-header">
+                        <div class="window-dots">
+                            <span class="window-dot window-dot-red"></span>
+                            <span class="window-dot window-dot-yellow"></span>
+                            <span class="window-dot window-dot-green"></span>
+                        </div>
+                        <div class="preview-address-bar">
+                            <i class="bi bi-lock-fill me-1 text-success fs-9"></i> app.interntrack.edu/student/dashboard
+                        </div>
+                        <div class="d-flex align-items-center gap-1.5 fs-8 text-muted">
+                            <span class="live-pulse-dot me-1"></span>
+                            <span class="fs-9 fw-semibold text-light">Live Cohort</span>
+                        </div>
+                    </div>
+
+                    <!-- Browser Window Body (Realistic InternTrack App Cards) -->
+                    <div class="preview-browser-body">
+                        
+                        <!-- 1. Current Active Placement Card -->
+                        <div class="preview-inner-card mb-3">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <div class="brand-icon-wrapper rounded-3 d-flex align-items-center justify-content-center bg-primary-soft text-primary" style="width: 40px; height: 40px;">
+                                        <i class="bi bi-building fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-white fw-bold mb-0">Google Cloud</h6>
+                                        <span class="text-muted fs-8">Software Engineer Intern • Bengaluru</span>
+                                    </div>
+                                </div>
+                                <span class="badge bg-success-soft text-success border border-secondary-soft rounded-pill px-2.5 py-1 fs-9">
+                                    <i class="bi bi-patch-check-fill me-1"></i> Approved
+                                </span>
+                            </div>
+                            <div class="d-flex flex-wrap align-items-center justify-content-between text-muted fs-8 pt-2 border-top border-secondary-soft">
+                                <span><i class="bi bi-person-badge text-info me-1"></i> Advisor: <strong>Prof. Alan Turing</strong></span>
+                                <span class="text-secondary"><i class="bi bi-calendar3 me-1"></i> Hybrid • 12 Weeks</span>
+                            </div>
+                        </div>
+
+                        <!-- 2. Internship Completion Progress Indicator -->
+                        <div class="preview-inner-card mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                <span class="text-light fw-semibold fs-8">Milestone Progression</span>
+                                <span class="text-white fw-bold fs-8">Stage 4 of 6 (68% Cleared)</span>
+                            </div>
+                            <div class="preview-progress-track mb-2">
+                                <div class="preview-progress-fill" style="width: 68%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between flex-wrap gap-1">
+                                <span class="stage-step-pill completed"><i class="bi bi-check-lg"></i> Reg</span>
+                                <span class="stage-step-pill completed"><i class="bi bi-check-lg"></i> Approval</span>
+                                <span class="stage-step-pill completed"><i class="bi bi-check-lg"></i> Week Logs</span>
+                                <span class="stage-step-pill current"><i class="bi bi-lightning-charge-fill"></i> Documents</span>
+                                <span class="stage-step-pill">Evaluation</span>
+                                <span class="stage-step-pill">Completed</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Upcoming Task & Latest Document Status (Two-Column Mini Widgets) -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-sm-6">
+                                <div class="preview-inner-card h-100">
+                                    <span class="text-muted fs-9 d-block text-uppercase fw-semibold mb-1">Upcoming Deadline</span>
+                                    <span class="text-white fw-semibold fs-8 d-block mb-1">Week 8 Progress Report</span>
+                                    <span class="badge bg-warning-soft text-warning rounded-pill px-2 py-0.5 fs-9">
+                                        <i class="bi bi-clock-history me-1"></i> Due in 2 days
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="preview-inner-card h-100">
+                                    <span class="text-muted fs-9 d-block text-uppercase fw-semibold mb-1">Latest Verification</span>
+                                    <span class="text-white fw-semibold fs-8 d-block mb-1">Offer Letter & Joining</span>
+                                    <span class="badge bg-info-soft text-info rounded-pill px-2 py-0.5 fs-9">
+                                        <i class="bi bi-file-earmark-check me-1"></i> Verified by Mentor
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Rubric Score Snippet Preview -->
+                        <div class="preview-inner-card bg-dark-deep border-secondary-soft">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-award-fill text-warning fs-5"></i>
+                                    <div>
+                                        <span class="text-light fw-bold fs-8 d-block">Mid-Term Evaluation Index</span>
+                                        <span class="text-muted fs-9">Technical • Communication • Quality • Discipline</span>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-primary-soft text-primary-gradient fw-bold fs-7 px-2.5 py-1">9.2 / 10</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="text-end mt-2">
+                    <span class="text-muted fs-9 font-monospace"><i class="bi bi-info-circle me-1"></i> Live illustrative preview of student interface</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     CORE FEATURES SECTION: 6 Standardized Capability Cards
+     ========================================================================= -->
+<section id="features" class="py-6 position-relative">
+    <div class="container">
+        
+        <div class="text-center max-w-650 mx-auto mb-5">
+            <span class="section-eyebrow">Comprehensive Platform Capabilities</span>
+            <h2 class="section-title mb-3">Built for Every Stage of the Academic Internship</h2>
+            <p class="section-subtitle">
+                Six integrated modules engineered to replace manual spreadsheets, fragmented emails, and paperwork with an auditable institutional system.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            
+            <!-- Feature 1: Internship Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="modern-feature-card">
+                    <div class="feature-icon-wrapper bg-primary-soft text-primary">
+                        <i class="bi bi-briefcase-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">1. Internship Management</h5>
+                    <p class="text-muted fs-7 mb-0">
+                        Submit and maintain corporate placement records with verified employer profiles, workplace mode (Online, Offline, Hybrid), supervisor contacts, and duplicate submission checks.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 2: Timeline Tracking -->
+            <div class="col-lg-4 col-md-6">
+                <div class="modern-feature-card">
+                    <div class="feature-icon-wrapper bg-info-soft text-info">
+                        <i class="bi bi-kanban-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">2. Timeline Tracking</h5>
+                    <p class="text-muted fs-7 mb-0">
+                        Monitor end-to-end milestone sequencing in real time. Automatic timeline generation ensures transparent checkpoint status from registration through mentor review to completion.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 3: Progress Monitoring -->
+            <div class="col-lg-4 col-md-6">
+                <div class="modern-feature-card">
+                    <div class="feature-icon-wrapper bg-success-soft text-success">
+                        <i class="bi bi-journal-check"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">3. Progress Monitoring</h5>
+                    <p class="text-muted fs-7 mb-0">
+                        Submit weekly activity logs with hours worked, tasks completed, skills acquired, and hurdles faced. Mentors provide structured inline feedback directly on each submission.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 4: Document Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="modern-feature-card">
+                    <div class="feature-icon-wrapper bg-warning-soft text-warning">
+                        <i class="bi bi-file-earmark-lock-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">4. Document Management</h5>
+                    <p class="text-muted fs-7 mb-0">
+                        Centralized repository for Offer Letters, Joining Letters, Weekly Logs, and Completion Certificates with file type validation, size checks, and path-traversal protected delivery.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 5: Deadline Management -->
+            <div class="col-lg-4 col-md-6">
+                <div class="modern-feature-card">
+                    <div class="feature-icon-wrapper bg-danger-soft text-danger">
+                        <i class="bi bi-calendar-check-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">5. Deadline Management</h5>
+                    <p class="text-muted fs-7 mb-0">
+                        Automated submission due-date calculations and dynamic countdown timers ensure students stay ahead of deadlines and notify faculty mentors of overdue submissions.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Feature 6: Faculty Evaluation -->
+            <div class="col-lg-4 col-md-6">
+                <div class="modern-feature-card">
+                    <div class="feature-icon-wrapper bg-primary-soft text-primary-gradient">
+                        <i class="bi bi-award-fill"></i>
+                    </div>
+                    <h5 class="text-white fw-bold mb-2">6. Faculty Evaluation</h5>
+                    <p class="text-muted fs-7 mb-0">
+                        Objective 5-metric scoring rubrics grading Technical Skills, Communication, Punctuality, Work Quality, and Discipline (0–10 scale) with instant scorecard publication.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     INSTITUTIONAL ANALYTICS & REPORTING HIGHLIGHT
+     ========================================================================= -->
+<section id="analytics" class="py-6 bg-dark-soft position-relative border-top border-bottom border-secondary-soft">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            
+            <div class="col-lg-5">
+                <span class="section-eyebrow">Institutional Analytics Engine</span>
+                <h2 class="section-title mb-3">Data-Driven Insights for Academic Leaders</h2>
+                <p class="section-subtitle mb-4">
+                    Equip Placement Deans and Department Heads with live cohort statistics, compliance auditing, recruiter metrics, and instant multi-format institutional exports.
+                </p>
+
+                <div class="d-flex flex-column gap-3">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-3 bg-primary-soft text-primary mt-1">
+                            <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-white fw-bold mb-1">Two-Pass Numbered PDF Export</h6>
+                            <p class="text-muted fs-8 mb-0">High-resolution institutional PDF scorecards and placement summaries with dynamic 'Page X of Y' pagination powered by ReportLab.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-3 bg-success-soft text-success mt-1">
+                            <i class="bi bi-file-earmark-spreadsheet-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-white fw-bold mb-1">CSV Placement Records Export</h6>
+                            <p class="text-muted fs-8 mb-0">One-click filtered export by department, status, and company for accreditation reviews and external audits.</p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="p-2 rounded-3 bg-info-soft text-info mt-1">
+                            <i class="bi bi-pie-chart-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-white fw-bold mb-1">Real-Time Cohort KPI Calculations</h6>
+                            <p class="text-muted fs-8 mb-0">Instant placement rates, active vs. completed breakdowns, and corporate recruiter distribution across academic streams.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Analytics Showcase Card -->
+            <div class="col-lg-7">
+                <div class="preview-browser-frame p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary-soft">
+                        <div>
+                            <span class="text-muted fs-8 d-block text-uppercase fw-semibold">Institutional Overview</span>
+                            <h5 class="text-white fw-bold mb-0">Placement Cohort Analytics</h5>
+                        </div>
+                        <span class="badge bg-primary-soft text-primary-gradient py-1.5 px-3 rounded-pill fs-8">
+                            <i class="bi bi-graph-up me-1"></i> Live Database Aggregation
+                        </span>
+                    </div>
+
+                    <!-- 3 KPI Metric Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-4">
+                            <div class="preview-inner-card text-center p-3">
+                                <span class="text-muted fs-8 d-block">Placement Rate</span>
+                                <h3 class="text-white fw-bold mb-0">100%</h3>
+                                <small class="text-success fs-9"><i class="bi bi-arrow-up-right me-0.5"></i> All Active Placed</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="preview-inner-card text-center p-3">
+                                <span class="text-muted fs-8 d-block">Active Interns</span>
+                                <h3 class="text-primary-gradient fw-bold mb-0">3 Cohorts</h3>
+                                <small class="text-muted fs-9">CS & Engineering</small>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="preview-inner-card text-center p-3">
+                                <span class="text-muted fs-8 d-block">Partner Companies</span>
+                                <h3 class="text-info fw-bold mb-0">3 Enterprise</h3>
+                                <small class="text-info fs-9">Google, Microsoft, Quantum</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Bar Preview -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 rounded-3 bg-dark-deep border border-secondary-soft">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check text-success fs-4"></i>
+                            <div>
+                                <span class="text-white fw-semibold fs-8 d-block">Official Accreditation Reports Ready</span>
+                                <span class="text-muted fs-9">Exportable with department and date filters</span>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="btn btn-sm btn-outline-custom rounded-pill py-1 px-3 fs-8">
+                                <i class="bi bi-file-earmark-arrow-down me-1"></i> .CSV
+                            </span>
+                            <span class="btn btn-sm btn-primary-gradient rounded-pill py-1 px-3 fs-8">
+                                <i class="bi bi-file-earmark-pdf me-1"></i> .PDF Report
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     6-STEP INTERNSHIP LIFECYCLE SECTION
+     ========================================================================= -->
+<section id="lifecycle" class="py-6 position-relative">
+    <div class="container">
+        
+        <div class="text-center max-w-650 mx-auto mb-5">
+            <span class="section-eyebrow">Milestone Architecture</span>
+            <h2 class="section-title mb-3">The 6-Step Internship Lifecycle</h2>
+            <p class="section-subtitle">
+                A standardized academic workflow guiding students from corporate offer submission through to faculty assessment and graduation certification.
+            </p>
+        </div>
+
+        <div class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-6">
+            
+            <div class="col">
+                <div class="lifecycle-step-card">
+                    <div class="step-number-circle">1</div>
+                    <h6 class="text-white fw-bold mb-1 fs-7">Student Registration</h6>
+                    <p class="text-muted fs-9 mb-0">Submit personal profiles, corporate role, and supervisor details.</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="lifecycle-step-card">
+                    <div class="step-number-circle">2</div>
+                    <h6 class="text-white fw-bold mb-1 fs-7">Faculty Approval</h6>
+                    <p class="text-muted fs-9 mb-0">Department faculty mentor validates role alignment and sets timelines.</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="lifecycle-step-card">
+                    <div class="step-number-circle">3</div>
+                    <h6 class="text-white fw-bold mb-1 fs-7">Weekly Progress Logs</h6>
+                    <p class="text-muted fs-9 mb-0">Log weekly work hours, completed tasks, and receive mentor feedback.</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="lifecycle-step-card">
+                    <div class="step-number-circle">4</div>
+                    <h6 class="text-white fw-bold mb-1 fs-7">Document Verification</h6>
+                    <p class="text-muted fs-9 mb-0">Upload offer letter, joining letter, and final report for verification.</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="lifecycle-step-card">
+                    <div class="step-number-circle">5</div>
+                    <h6 class="text-white fw-bold mb-1 fs-7">Faculty Evaluation</h6>
+                    <p class="text-muted fs-9 mb-0">Comprehensive 5-metric rubric grading (0–10 scale) by faculty.</p>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="lifecycle-step-card">
+                    <div class="step-number-circle">6</div>
+                    <h6 class="text-white fw-bold mb-1 fs-7">Final Certification</h6>
+                    <p class="text-muted fs-9 mb-0">Performance scorecard publication and final internship completion.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     ROLE WORKSPACES SECTION: 3 Distinct Stakeholder Portals
+     ========================================================================= -->
+<section id="benefits" class="py-6 bg-dark-soft position-relative border-top border-secondary-soft">
+    <div class="container">
+        
+        <div class="text-center max-w-650 mx-auto mb-5">
+            <span class="section-eyebrow">Role-Based Experience</span>
+            <h2 class="section-title mb-3">Tailored Workspaces for Every Role</h2>
+            <p class="section-subtitle">
+                Engineered with Role-Based Access Control (RBAC) so each user group receives an interface tailored to their exact responsibilities.
+            </p>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            
+            <!-- Student Portal -->
+            <div class="col-lg-4 col-md-6">
+                <div class="portal-card portal-student">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary-soft text-primary border border-secondary-soft py-1 px-2.5 rounded-pill fs-8">
+                            <i class="bi bi-mortarboard me-1"></i> Student Portal
+                        </span>
+                        <span class="text-muted fs-8 fw-semibold">Role 1</span>
+                    </div>
+                    <h4 class="text-white fw-bold mb-2">Student Experience</h4>
+                    <p class="text-muted fs-7 mb-4">
+                        A focused portal to track applications, record weekly achievements, upload compliance forms, and view evaluation feedback.
+                    </p>
+
+                    <ul class="list-unstyled d-flex flex-column gap-2.5 mb-4 flex-grow-1 text-start">
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-primary me-2.5 fs-7"></i> Interactive Milestone Progression
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-primary me-2.5 fs-7"></i> Weekly Hour & Task Logging
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-primary me-2.5 fs-7"></i> Secure Document Vault Uploads
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-primary me-2.5 fs-7"></i> Real-Time Evaluation Scorecard
+                        </li>
+                    </ul>
+
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-outline-custom w-100 rounded-pill fs-8 py-2">
+                        Register as Student <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Faculty Hub -->
+            <div class="col-lg-4 col-md-6">
+                <div class="portal-card portal-faculty">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-success-soft text-success border border-secondary-soft py-1 px-2.5 rounded-pill fs-8">
+                            <i class="bi bi-person-badge me-1"></i> Faculty Hub
+                        </span>
+                        <span class="text-muted fs-8 fw-semibold">Role 2</span>
+                    </div>
+                    <h4 class="text-white fw-bold mb-2">Faculty Mentor Workspace</h4>
+                    <p class="text-muted fs-7 mb-4">
+                        Action-driven oversight to review placement requests, approve student submissions, and grade candidates on multi-criteria rubrics.
+                    </p>
+
+                    <ul class="list-unstyled d-flex flex-column gap-2.5 mb-4 flex-grow-1 text-start">
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-success me-2.5 fs-7"></i> One-Click Placement Approvals
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-success me-2.5 fs-7"></i> Weekly Log Review & Feedback
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-success me-2.5 fs-7"></i> Document Verification Engine
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-success me-2.5 fs-7"></i> 5-Criteria Rubric Scoring
+                        </li>
+                    </ul>
+
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-custom w-100 rounded-pill fs-8 py-2">
+                        Sign In as Faculty <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Admin Console -->
+            <div class="col-lg-4 col-md-6">
+                <div class="portal-card portal-admin">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-warning-soft text-warning border border-secondary-soft py-1 px-2.5 rounded-pill fs-8">
+                            <i class="bi bi-shield-check me-1"></i> Admin Console
+                        </span>
+                        <span class="text-muted fs-8 fw-semibold">Role 3</span>
+                    </div>
+                    <h4 class="text-white fw-bold mb-2">Administrator Console</h4>
+                    <p class="text-muted fs-7 mb-4">
+                        Comprehensive institutional oversight: manage student and company masters, review departmental analytics, and export official reports.
+                    </p>
+
+                    <ul class="list-unstyled d-flex flex-column gap-2.5 mb-4 flex-grow-1 text-start">
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-warning me-2.5 fs-7"></i> Complete Entity CRUD Control
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-warning me-2.5 fs-7"></i> Institutional Placement Analytics
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-warning me-2.5 fs-7"></i> Enterprise ReportLab PDF Engine
+                        </li>
+                        <li class="d-flex align-items-center text-light fs-8">
+                            <i class="bi bi-check2-circle text-warning me-2.5 fs-7"></i> Security Auditing & RBAC
+                        </li>
+                    </ul>
+
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-custom w-100 rounded-pill fs-8 py-2">
+                        Sign In as Administrator <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- =========================================================================
+     PRE-FOOTER CALLOUT BANNER
+     ========================================================================= -->
+<section class="py-6 position-relative">
+    <div class="container">
+        <div class="callout-banner text-center max-w-650 mx-auto">
+            <h2 class="text-white fw-bold mb-3">Ready to Modernize Your Internship Management?</h2>
+            <p class="text-muted fs-7 mb-4">
+                Experience an end-to-end academic workflow engineered for clarity, transparency, and administrative compliance.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                {% if session.get('user_id') %}
+                    <a href="{{ url_for('auth.profile') }}" class="btn btn-primary-cta">
+                        View Your Account Profile <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary-cta">
+                        Register Account <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-secondary-cta">
+                        Sign In to Portal
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

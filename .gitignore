@@ -1,0 +1,70 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Distribution / Packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+test_out.txt
+
+# Database & Runtime local storage
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+*.db-journal
+database/*.db
+
+# User Uploads & Temporary Scratch
+uploads/*
+!uploads/.gitkeep
+scratch/
+*.zip
+
+# VS Code User Local Overrides
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/
+
+# OS specific files
+.DS_Store
+Thumbs.db
+.neon
+node_modules/
+
+# Local Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+neon.txt
+*neon*.txt
+*.key
+*.pem
